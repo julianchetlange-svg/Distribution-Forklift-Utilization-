@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>McCoy's Distribution Forklift Analysis</title>
+<style>
+  :root {
+    --green:       #2D6A2D;
+    --green-mid:   #3D8B3D;
+    --green-light: #EAF3E0;
+    --green-pale:  #F4FAF0;
+    --yellow:      #F5C400;
+    --yellow-light:#FFFBE6;
+    --yellow-mid:  #E6B800;
+    --white:       #FFFFFF;
+    --off-white:   #F8F8F6;
+    --gray-1:      #F2F2EF;
+    --gray-2:      #E0E0DA;
+    --gray-3:      #ABABAB;
+    --gray-4:      #555550;
+    --dark:        #1A1A18;
+    --red:         #C0392B;
+    --red-light:   #FDEDEC;
+    --orange:      #D35400;
+    --orange-light:#FEF0E6;
+    --radius:      8px;
+    --radius-lg:   12px;
+    --shadow:      0 1px 3px rgba(0,0,0,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--off-white); color: var(--dark); font-size: 14px; }
+
+  /* ── HEADER ── */
+  .header { background: var(--green); padding: 0; }
+  .header-inner { display: flex; align-items: center; justify-content: space-between; padding: 14px 28px; }
+  .logo-area { display: flex; align-items: center; gap: 14px; }
+  .logo-badge { width: 44px; height: 44px; background: var(--yellow); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; color: var(--green); letter-spacing: -1px; }
+  .header-title { color: var(--white); }
+  .header-title h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
+  .header-title p { font-size: 12px; color: rgba(255,255,255,0.7); margin-top: 2px; }
+  .header-meta { text-align: right; color: rgba(255,255,255,0.8); font-size: 12px; }
+  .header-meta strong { color: var(--yellow); font-size: 13px; display: block; }
+  .data-notice { background: var(--yellow); padding: 7px 28px; font-size: 12px; font-weight: 600; color: var(--green); display: flex; align-items: center; gap: 8px; }
+  .data-notice span { font-weight: 400; color: #5a4a00; }
+
+  /* ── NAV TABS ── */
+  .nav { background: var(--white); border-bottom: 2px solid var(--gray-2); padding: 0 28px; display: flex; gap: 0; }
+  .nav-btn { padding: 12px 20px; font-size: 13px; font-weight: 600; color: var(--gray-4); background: none; border: none; border-bottom: 3px solid transparent; cursor: pointer; margin-bottom: -2px; transition: color .15s, border-color .15s; }
+  .nav-btn:hover { color: var(--green); }
+  .nav-btn.active { color: var(--green); border-bottom-color: var(--green); }
+
+  /* ── LAYOUT ── */
+  .main { padding: 20px 28px; max-width: 1400px; margin: 0 auto; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ── KPI GRID ── */
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .kpi { background: var(--white); border-radius: var(--radius); padding: 16px 18px; border: 1px solid var(--gray-2); box-shadow: var(--shadow); }
+  .kpi-label { font-size: 11px; font-weight: 600; color: var(--gray-3); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+  .kpi-value { font-size: 26px; font-weight: 700; color: var(--green); line-height: 1; }
+  .kpi-sub { font-size: 11px; color: var(--gray-3); margin-top: 4px; }
+  .kpi.yellow .kpi-value { color: var(--yellow-mid); }
+  .kpi.red .kpi-value { color: var(--red); }
+  .kpi.dark .kpi-value { color: var(--gray-4); }
+
+  /* ── SECTION HEADERS ── */
+  .section-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; margin-top: 24px; }
+  .section-hdr h2 { font-size: 15px; font-weight: 700; color: var(--green); display: flex; align-items: center; gap: 8px; }
+  .section-hdr h2::before { content: ''; width: 4px; height: 18px; background: var(--yellow); border-radius: 2px; display: inline-block; }
+
+  /* ── CARDS ── */
+  .card { background: var(--white); border-radius: var(--radius-lg); border: 1px solid var(--gray-2); box-shadow: var(--shadow); padding: 18px 20px; margin-bottom: 16px; }
+  .card-title { font-size: 13px; font-weight: 700; color: var(--green); margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--gray-1); }
+
+  /* ── TWO COL ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+  /* ── CHART WRAPPER ── */
+  .chart-wrap { position: relative; width: 100%; }
+
+  /* ── TABLE ── */
+  .tbl-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th { background: var(--green); color: var(--white); padding: 8px 10px; text-align: center !important; font-size: 11px; font-weight: 600; letter-spacing: .04em; white-space: nowrap; position: sticky; top: 0; }
+  th:first-child { border-radius: 6px 0 0 0; }
+  th:last-child { border-radius: 0 6px 0 0; }
+  td { padding: 7px 10px; border-bottom: 1px solid var(--gray-1); color: var(--dark); white-space: nowrap; text-align: center; }
+  tr:hover td { background: var(--green-pale); }
+  tr:last-child td { border-bottom: none; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .asset-tbl td:nth-child(2), .asset-tbl td:nth-child(3) { text-align: left; }
+
+  /* ── BADGES ── */
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; letter-spacing: .04em; }
+  .badge-red { background: var(--red-light); color: var(--red); }
+  .badge-orange { background: var(--orange-light); color: var(--orange); }
+  .badge-green { background: var(--green-light); color: var(--green); }
+  .badge-yellow { background: var(--yellow-light); color: #7a5f00; }
+  .badge-gray { background: var(--gray-1); color: var(--gray-4); }
+
+  /* ── UTILIZATION BAR ── */
+  .util-bar { display: flex; align-items: center; gap: 6px; }
+  .util-bg { flex: 1; height: 6px; background: var(--gray-1); border-radius: 3px; min-width: 60px; overflow: hidden; }
+  .util-fill { height: 100%; border-radius: 3px; }
+  .util-val { font-size: 11px; min-width: 32px; text-align: right; font-variant-numeric: tabular-nums; }
+
+  /* ── FILTERS ── */
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
+  .filters select, .filters input { font-size: 12px; padding: 6px 10px; border: 1px solid var(--gray-2); border-radius: var(--radius); background: var(--white); color: var(--dark); }
+  .filters select:focus, .filters input:focus { outline: 2px solid var(--green); border-color: var(--green); }
+  .filter-label { font-size: 11px; font-weight: 600; color: var(--gray-3); text-transform: uppercase; }
+  .result-count { font-size: 12px; color: var(--gray-3); margin-left: auto; }
+
+  /* ── ALERT BOX ── */
+  .alert { border-radius: var(--radius); padding: 12px 16px; font-size: 13px; margin-bottom: 16px; border-left: 4px solid; }
+  .alert-yellow { background: var(--yellow-light); border-color: var(--yellow); color: #5a4a00; }
+  .alert-green { background: var(--green-light); border-color: var(--green); color: var(--green); }
+  .alert-red { background: var(--red-light); border-color: var(--red); color: var(--red); }
+  .alert strong { font-weight: 700; }
+
+  /* ── LEGEND ── */
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 10px; font-size: 12px; color: var(--gray-4); }
+  .leg { display: flex; align-items: center; gap: 5px; }
+  .leg-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+  /* ── DETAIL DRAWER ── */
+  #drawer-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; }
+  #drawer { position: fixed; right: 0; top: 0; bottom: 0; width: 480px; background: var(--white); box-shadow: -4px 0 20px rgba(0,0,0,0.15); z-index: 101; overflow-y: auto; padding: 24px; transform: translateX(100%); transition: transform .25s; }
+  #drawer.open { transform: translateX(0); }
+  .drawer-close { position: absolute; top: 16px; right: 16px; background: var(--gray-1); border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; font-size: 16px; color: var(--gray-4); }
+  .drawer-close:hover { background: var(--gray-2); }
+  .drawer-store { font-size: 22px; font-weight: 700; color: var(--green); margin-bottom: 4px; }
+  .drawer-sub { font-size: 13px; color: var(--gray-3); margin-bottom: 20px; }
+  .drawer-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+  .drawer-metric { background: var(--green-pale); border-radius: var(--radius); padding: 12px; }
+  .drawer-metric-label { font-size: 10px; font-weight: 600; color: var(--green-mid); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+  .drawer-metric-value { font-size: 20px; font-weight: 700; color: var(--green); }
+  .drawer-metric-sub { font-size: 10px; color: var(--gray-3); margin-top: 2px; }
+  .drawer-section { font-size: 12px; font-weight: 700; color: var(--green); text-transform: uppercase; letter-spacing: .06em; margin: 16px 0 8px; padding-bottom: 6px; border-bottom: 1px solid var(--gray-2); }
+  .drawer-asset-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--gray-1); font-size: 12px; }
+  .drawer-asset-row:last-child { border-bottom: none; }
+  .asset-id { font-weight: 600; color: var(--dark); }
+  .asset-type { color: var(--gray-3); font-size: 11px; }
+  .pending-note { background: var(--yellow-light); border: 1px dashed var(--yellow-mid); border-radius: var(--radius); padding: 10px 14px; font-size: 12px; color: #7a5f00; margin-bottom: 16px; }
+
+  /* ── SCROLLABLE TABLE ── */
+  .scroll-table { max-height: 480px; overflow-y: auto; border-radius: var(--radius); border: 1px solid var(--gray-2); }
+  .scroll-table table th { position: sticky; top: 0; z-index: 2; text-align: center; background: var(--green); color: var(--white); }
+
+  /* ── SAVINGS CALLOUT ── */
+  .savings-banner { background: var(--green); color: var(--white); border-radius: var(--radius-lg); padding: 20px 24px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+  .savings-banner h3 { font-size: 13px; font-weight: 600; opacity: .8; margin-bottom: 4px; }
+  .savings-banner .big-num { font-size: 32px; font-weight: 700; color: var(--yellow); }
+  .savings-banner p { font-size: 12px; opacity: .7; margin-top: 4px; }
+  .savings-divider { width: 1px; height: 60px; background: rgba(255,255,255,0.2); }
+
+  /* ── BLENDED STORE-ASSET VIEW ── */
+  .store-block { margin-bottom: 8px; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--gray-2); }
+  .store-block.has-flagged { border-color: #E24B4A; border-width: 1.5px; }
+  .store-hdr { display: flex; align-items: center; gap: 0; cursor: pointer; background: var(--white); padding: 0; user-select: none; }
+  .store-hdr:hover { background: var(--green-pale); }
+  .store-hdr.flagged-store { background: var(--red-light); }
+  .store-chevron { width: 36px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--gray-3); flex-shrink: 0; transition: transform .2s; }
+  .store-chevron.open { transform: rotate(90deg); }
+  .store-hdr-main { flex: 1; display: grid; grid-template-columns: 160px 80px 90px 90px 90px 90px 90px 90px 1fr; gap: 0; align-items: stretch; }
+  .store-hdr-cell { padding: 10px 10px; font-size: 12px; border-right: 1px solid var(--gray-1); }
+  .store-hdr-cell:last-child { border-right: none; }
+  .store-hdr-cell .cell-label { font-size: 10px; color: var(--gray-3); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 3px; }
+  .store-hdr-cell .cell-val { font-size: 13px; font-weight: 600; color: var(--dark); }
+  .store-hdr-cell .cell-sub { font-size: 10px; color: var(--gray-3); margin-top: 1px; }
+  .store-name-cell { padding: 10px 12px; }
+  .store-name-cell .sname { font-size: 13px; font-weight: 700; color: var(--green); }
+  .store-name-cell .sloc { font-size: 11px; color: var(--gray-3); margin-top: 1px; }
+  .flag-pill { display: inline-flex; align-items: center; gap: 3px; background: #FCEBEB; color: #A32D2D; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 3px; margin-top: 3px; }
+  .store-assets { display: none; background: var(--gray-1); }
+  .store-assets.open { display: block; }
+  .asset-tbl { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .asset-tbl th { background: var(--green); color: var(--white); padding: 7px 10px; text-align: center !important; font-size: 10px; font-weight: 600; letter-spacing: .04em; white-space: nowrap; }
+  .asset-tbl td { padding: 7px 10px; background: var(--white); border-bottom: 1px solid var(--gray-1); font-size: 12px; white-space: nowrap; text-align: center; }
+  .asset-tbl tr:last-child td { border-bottom: none; }
+  .asset-tbl tr:hover td { background: var(--green-pale); }
+  .asset-tbl tr.asset-flagged td { background: #FFF8F8; }
+  .asset-tbl tr.asset-flagged td:first-child { border-left: 3px solid #E24B4A; }
+  .hpd-bar { display: flex; align-items: center; gap: 5px; }
+  .hpd-bg { width: 50px; height: 5px; background: var(--gray-2); border-radius: 3px; overflow: hidden; flex-shrink: 0; }
+  .hpd-fill { height: 100%; border-radius: 3px; }
+  .col-hdr-row { display: grid; grid-template-columns: 36px 160px 80px 90px 90px 90px 90px 90px 90px 1fr; font-size: 10px; font-weight: 600; color: var(--gray-3); text-transform: uppercase; letter-spacing: .05em; padding: 6px 0 4px; border-bottom: 1px solid var(--gray-2); margin-bottom: 4px; }
+  .col-hdr-row span { padding: 0 10px; }
+
+
+  /* ── TIER TAGS ── */
+  .tier-tag { display: inline-block; font-size: 9px; font-weight: 700;
+    padding: 1px 6px; border-radius: 3px; margin-left: 5px; vertical-align: middle;
+    letter-spacing: .04em; text-transform: uppercase; }
+  .tier-top20    { background: #EAF3DE; color: #2D6A2D; border: 1px solid #2D6A2D; }
+  .tier-bottom20 { background: #FCEBEB; color: #A32D2D; border: 1px solid #A32D2D; }
+  .tier-below-min { background: #FFF2CC; color: #7F6000; border: 1px solid #F5C400; }
+  .tier-move20   { background: #E8F4FD; color: #185FA5; border: 1px solid #378ADD; }
+
+
+  .tier-yt-top    { background: #E3F0FB; color: #1A5490; border: 1px solid #2E7BC4; }
+  .tier-yt-bottom { background: #F3E8FB; color: #6B2C8F; border: 1px solid #9B59B6; }
+
+  .tier-at-min   { background: #FFF2CC; color: #7F6000; border: 1px solid #F5C400; }
+  .tier-below-min-red { background: #FCEBEB; color: #A32D2D; border: 1px solid #A32D2D; }
+
+  .tier-new      { background: #E8F4FD; color: #185FA5; border: 1px solid #378ADD; }
+
+  /* ── REMOVAL IMPACT PANEL ── */
+  .removal-panel { background: #F8FAF7; border-top: 1px solid var(--gray-2);
+    padding: 12px 16px; }
+  .removal-panel-title { font-size: 11px; font-weight: 700; color: var(--green);
+    text-transform: uppercase; letter-spacing: .06em; margin-bottom: 10px; }
+  .removal-steps { display: flex; flex-direction: column; gap: 8px; }
+  .removal-step { background: var(--white); border-radius: var(--radius);
+    border: 1px solid var(--gray-2); padding: 10px 14px;
+    display: grid; grid-template-columns: 24px 1fr 1fr 1fr 1fr; gap: 12px;
+    align-items: center; font-size: 12px; }
+  .removal-step.step-flagged { border-left: 3px solid #E24B4A; }
+  .removal-step.step-move20  { border-left: 3px solid #378ADD; }
+  .step-num { width: 22px; height: 22px; border-radius: 50%;
+    background: var(--green); color: white; font-size: 10px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .step-asset { font-size: 12px; }
+  .step-asset .asset-id { font-weight: 700; color: var(--dark); }
+  .step-asset .asset-sub { font-size: 10px; color: var(--gray-3); margin-top: 1px; }
+  .step-metric { text-align: center; }
+  .step-metric .metric-val { font-size: 14px; font-weight: 700; color: var(--green); }
+  .step-metric .metric-change { font-size: 10px; color: var(--gray-3); margin-top: 1px; }
+  .step-metric .metric-change.positive { color: #2D6A2D; }
+  .step-metric .metric-change.negative { color: #C0392B; }
+  .step-metric .metric-label { font-size: 9px; text-transform: uppercase;
+    letter-spacing: .05em; color: var(--gray-3); margin-bottom: 2px; }
+  .removal-note { font-size: 10px; color: var(--gray-3); margin-top: 8px;
+    font-style: italic; }
+  .below-min-note { background: #FFFBE6; border: 1px solid #F5C400;
+    border-radius: var(--radius); padding: 8px 12px; font-size: 11px;
+    color: #7F6000; margin-top: 8px; }
+  .no-removal-note { font-size: 11px; color: var(--gray-3); font-style: italic;
+    padding: 8px 0; }
+
+
+  /* ── CUSTOM TOOLTIPS ── */
+  [data-tip] { position: relative; cursor: help; }
+  [data-tip]::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-6px);
+    background: #1F4D1F;
+    color: #FFFFFF;
+    padding: 8px 11px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 400;
+    line-height: 1.4;
+    letter-spacing: 0;
+    text-transform: none;
+    white-space: normal;
+    width: max-content;
+    max-width: 260px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.22);
+    border-left: 3px solid #F5C400;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .12s ease, transform .12s ease;
+    z-index: 9999;
+    pointer-events: none;
+    text-align: left;
+  }
+  [data-tip]::before {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(2px);
+    border: 6px solid transparent;
+    border-top-color: #1F4D1F;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .12s ease;
+    z-index: 9999;
+    pointer-events: none;
+  }
+  [data-tip]:hover::after { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(-8px); }
+  [data-tip]:hover::before { opacity: 1; visibility: visible; }
+  /* Header tooltips need higher stacking and the th must allow overflow */
+  th[data-tip] { overflow: visible; }
+  .scroll-table table th[data-tip] { position: sticky; }
+  /* For tooltips near the top edge, show below instead */
+  [data-tip-below]::after { bottom: auto; top: 100%; transform: translateX(-50%) translateY(6px); }
+  [data-tip-below]::before { bottom: auto; top: 100%; transform: translateX(-50%) translateY(-2px) rotate(180deg); }
+  [data-tip-below]:hover::after { transform: translateX(-50%) translateY(8px); }
+
+  /* Header cell tooltips always render below to avoid scroll-container clipping */
+  th[data-tip]::after { bottom: auto; top: 100%; transform: translateX(-50%) translateY(6px); }
+  th[data-tip]::before { bottom: auto; top: 100%; transform: translateX(-50%) translateY(-2px) rotate(180deg); }
+  th[data-tip]:hover::after { transform: translateX(-50%) translateY(8px); }
+
+
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo-area">
+    <div class="logo-box">M</div>
+    <div>
+      <h1>McCoy's Distribution Fleet Analysis</h1>
+      <div class="subtitle">5 Distribution Centers · 45 Active + 5 New Forklifts</div>
+    </div>
+  </div>
+  <div class="header-meta">
+    <strong>As of April 30, 2026</strong> &nbsp;·&nbsp; 307 operating days/yr
+  </div>
+</div>
+
+<div class="data-notice" style="background:var(--cream);border-bottom:1px solid var(--gray-1);padding:10px 28px;font-size:11px;color:var(--gray-4)">
+  <span><strong>Note:</strong> Yard ticket data not applicable to distribution centers. HPD-based analysis only.</span>
+</div>
+
+<nav class="nav">
+  <button class="nav-btn active" onclick="showTab('overview')">Fleet Overview</button>
+  <button class="nav-btn" onclick="showTab('dcs')">DC Detail</button>
+  <button class="nav-btn" onclick="showTab('assets')">Asset Detail</button>
+</nav>
+
+<main class="content">
+
+<!-- ════════════════════ FLEET OVERVIEW ═══════════════════════════════════ -->
+<div id="panel-overview" class="panel active">
+
+  <div class="savings-banner">
+    <div class="big-num">$193,058</div>
+    <p>14 flagged assets · 4 DCs with removal opportunity · annual flat rate basis</p>
+  </div>
+
+  <div class="kpi-grid" style="margin-bottom:20px">
+    <div class="kpi"><div class="kpi-label">Total DC Fleet</div><div class="kpi-value">50</div><div class="kpi-sub">across 5 DCs</div></div>
+    <div class="kpi"><div class="kpi-label">Annual Fleet Cost</div><div class="kpi-value">$808,059</div><div class="kpi-sub">flat rate to P&amp;L</div></div>
+    <div class="kpi"><div class="kpi-label">Lifetime Maint. Spend</div><div class="kpi-value">$2,098,999</div><div class="kpi-sub">adjusted through Apr 30, 2026</div></div>
+    <div class="kpi yellow"><div class="kpi-label">Avg HPD</div><div class="kpi-value">3.427</div><div class="kpi-sub">hours per business day</div></div>
+    <div class="kpi yellow"><div class="kpi-label">Avg Cost/Hour</div><div class="kpi-value">$10.9</div><div class="kpi-sub">DC fleet average</div></div>
+    <div class="kpi red"><div class="kpi-label">Flagged Assets</div><div class="kpi-value">14</div><div class="kpi-sub">below 80% of store avg HPD (2.643)</div></div>
+  </div>
+
+  <div class="section-hdr"><h2>Distribution Centers vs Store Fleet</h2></div>
+  <div class="alert" style="background:#FFF7DB;border-left:4px solid var(--yellow);padding:14px 18px;margin-bottom:14px;font-size:13px;line-height:1.6">
+    Each DC is ranked here as if it were a store. Of 85 ranked stores, four of the five DCs would fall in the bottom half of the fleet — three in the bottom 25%. This benchmark helps frame whether DC capacity is matched to workload.
+  </div>
+
+  <div class="card" style="margin-bottom:20px">
+    <table style="width:100%">
+      <thead><tr>
+        <th>DC</th>
+        <th>Location</th>
+        <th>Units</th>
+        <th data-tip="Average daily operating hours per business day across DC fleet.">Avg HPD</th>
+        <th data-tip="Sum of lifetime maintenance spend divided by total operating hours.">Avg CPH</th>
+        <th data-tip="Where this DC would rank if compared against the 85 stores in the store fleet.">Rank vs Stores</th>
+        <th data-tip="DC's avg HPD vs the store fleet avg HPD (3.304).">vs Store Avg</th>
+        <th>Flagged Units</th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>359</strong></td>
+          <td style="text-align:left">Burnet Reload</td>
+          <td>24</td>
+          <td>4.21</td>
+          <td>$11.05</td>
+          <td><strong>7</strong> / 85 <span class="badge badge-green">Top 20</span></td>
+          <td><span style="color:var(--green);font-weight:600">+27.4%</span></td>
+          <td><span class="badge badge-red">5</span></td>
+        </tr>
+        <tr>
+          <td><strong>489</strong></td>
+          <td style="text-align:left">EWP Program</td>
+          <td>9</td>
+          <td>3.068</td>
+          <td>$9.42</td>
+          <td><strong>48</strong> / 85 <span class="badge" style="background:#FFF7DB;color:#856404;border:1px solid #FFC107">Middle</span></td>
+          <td><span style="color:#C0392B;font-weight:600">-7.1%</span></td>
+          <td><span class="badge badge-red">2</span></td>
+        </tr>
+        <tr>
+          <td><strong>353</strong></td>
+          <td style="text-align:left">Dayton Distribution</td>
+          <td>6</td>
+          <td>2.661</td>
+          <td>$6.73</td>
+          <td><strong>65</strong> / 85 <span class="badge" style="background:#FFF7DB;color:#856404;border:1px solid #FFC107">Middle</span></td>
+          <td><span style="color:#C0392B;font-weight:600">-19.5%</span></td>
+          <td><span class="badge badge-red">2</span></td>
+        </tr>
+        <tr>
+          <td><strong>356</strong></td>
+          <td style="text-align:left">Midland Distribution Center</td>
+          <td>10</td>
+          <td>2.468</td>
+          <td>$14.82</td>
+          <td><strong>74</strong> / 85 <span class="badge badge-red">Bottom 20</span></td>
+          <td><span style="color:#C0392B;font-weight:600">-25.3%</span></td>
+          <td><span class="badge badge-red">5</span></td>
+        </tr>
+        <tr>
+          <td><strong>479</strong></td>
+          <td style="text-align:left">Rebar Bender</td>
+          <td>1</td>
+          <td><span style="color:var(--gray-3)">—</span></td>
+          <td><span style="color:var(--gray-3)">—</span></td>
+          <td><span style="color:var(--gray-3)">No analysis data yet</span> <span class="badge" style="background:#E8F0FE;color:#1A56DB;border:1px solid #4F86F7">New Unit Only</span></td>
+          <td><span style="color:var(--gray-3)">—</span></td>
+          <td><span style="color:var(--gray-3)">0</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-hdr"><h2>Removal Opportunity by DC</h2></div>
+  <div class="card">
+    <table style="width:100%">
+      <thead><tr>
+        <th>DC</th>
+        <th>Location</th>
+        <th>Removable Units</th>
+        <th data-tip="Annual flat rate that would no longer hit the P&amp;L.">Annual P&amp;L Savings</th>
+        <th>Projected HPD</th>
+        <th>Projected Rank vs Stores</th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>359</strong></td>
+          <td style="text-align:left">Burnet Reload</td>
+          <td><span class="badge badge-red">4</span></td>
+          <td><strong style="color:var(--green)">$63,769/yr</strong></td>
+          <td>4.21 <span style="color:var(--gray-3)">→</span> <strong>5.2</strong></td>
+          <td>7 <span style="color:var(--gray-3)">→</span> <strong>1</strong> / 85 <span style="color:var(--green);font-size:11px">▲6</span></td>
+        </tr>
+        <tr>
+          <td><strong>489</strong></td>
+          <td style="text-align:left">EWP Program</td>
+          <td><span class="badge badge-red">3</span></td>
+          <td><strong style="color:var(--green)">$59,461/yr</strong></td>
+          <td>3.068 <span style="color:var(--gray-3)">→</span> <strong>4.603</strong></td>
+          <td>48 <span style="color:var(--gray-3)">→</span> <strong>3</strong> / 85 <span style="color:var(--green);font-size:11px">▲45</span></td>
+        </tr>
+        <tr>
+          <td><strong>353</strong></td>
+          <td style="text-align:left">Dayton Distribution</td>
+          <td><span class="badge badge-red">2</span></td>
+          <td><strong style="color:var(--green)">$24,347/yr</strong></td>
+          <td>2.661 <span style="color:var(--gray-3)">→</span> <strong>3.991</strong></td>
+          <td>65 <span style="color:var(--gray-3)">→</span> <strong>8</strong> / 85 <span style="color:var(--green);font-size:11px">▲57</span></td>
+        </tr>
+        <tr>
+          <td><strong>356</strong></td>
+          <td style="text-align:left">Midland Distribution Center</td>
+          <td><span class="badge badge-red">3</span></td>
+          <td><strong style="color:var(--green)">$45,479/yr</strong></td>
+          <td>2.468 <span style="color:var(--gray-3)">→</span> <strong>3.702</strong></td>
+          <td>74 <span style="color:var(--gray-3)">→</span> <strong>22</strong> / 85 <span style="color:var(--green);font-size:11px">▲52</span></td>
+        </tr>
+        <tr>
+          <td><strong>479</strong></td>
+          <td style="text-align:left">Rebar Bender</td>
+          <td style="color:var(--gray-3)">—</td>
+          <td style="color:var(--gray-3)">—</td>
+          <td style="color:var(--gray-3)">—</td>
+          <td style="color:var(--gray-3)">—</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- ════════════════════ DC DETAIL ═══════════════════════════════════════ -->
+<div id="panel-dcs" class="panel">
+  <div class="section-hdr"><h2>DC Detail — Removal Opportunities</h2></div>
+  <div class="alert" style="background:#F4FAF0;border-left:4px solid var(--green);padding:12px 16px;margin-bottom:14px;font-size:13px;line-height:1.6">
+    <strong style="color:var(--green)">Methodology:</strong> Removal candidates are identified using the 80% of store fleet average HPD threshold (2.643). This more aggressive threshold reflects that DCs run multiple shifts where underutilization is more material than at stores. At each DC, the oldest unit of the targeted type class is pulled. Forklifts of larger capacity can absorb workload from smaller classes (e.g. an 11K can handle 10K work, a 13K can handle 11K work), so the analysis does not require keeping a unit of every capacity class — it considers the full fleet at each DC as the workload-absorbing pool. Workload is conserved across the remaining fleet.</div>
+  <div id="dc-list"></div>
+</div>
+
+<!-- ════════════════════ ASSET DETAIL ═══════════════════════════════════════ -->
+<div id="panel-assets" class="panel">
+  <div class="section-hdr"><h2>All DC Assets</h2></div>
+  <div class="filter-bar" style="display:flex;gap:14px;align-items:center;margin-bottom:14px;flex-wrap:wrap">
+    <label style="font-size:12px">DC:
+      <select id="asset-dc-filter" onchange="renderAssetTable()">
+        <option value="">All</option><option value="353">353 Dayton Distribution</option><option value="356">356 Midland Distribution Center</option><option value="359">359 Burnet Reload</option><option value="479">479 Rebar Bender</option><option value="489">489 EWP Program</option>      </select>
+    </label>
+    <label style="font-size:12px">Type:
+      <select id="asset-type-filter" onchange="renderAssetTable()">
+        <option value="">All</option>
+      </select>
+    </label>
+    <label style="font-size:12px">
+      <input type="checkbox" id="asset-flagged-only" onchange="renderAssetTable()"> Show flagged only
+    </label>
+    <span id="asset-count" style="font-size:11px;color:var(--gray-3);margin-left:auto"></span>
+  </div>
+  <div class="card">
+    <div class="scroll-table" style="max-height:650px">
+      <table>
+        <thead><tr>
+          <th>DC</th>
+          <th>Asset</th>
+          <th>Type</th>
+          <th>Own</th>
+          <th>Age</th>
+          <th data-tip="Average daily operating hours per business day over the life of the asset.">HPD</th>
+          <th data-tip="Asset HPD vs store fleet average HPD.">vs Store Avg</th>
+          <th data-tip="Sum of lifetime maintenance spend divided by total operating hours.">Cost/Hr</th>
+          <th>Lifetime Maint.</th>
+          <th data-tip="Total monthly maintenance divided by months in service.">$/Mo</th>
+          <th data-tip="Annual flat rate charge that hits the P&amp;L.">Annual Rate</th>
+          <th>Flagged?</th>
+        </tr></thead>
+        <tbody id="asset-table"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<script>
+const DC_SUMMARY = [{"dc_label": "353", "name": "Dayton Distribution", "region": "Distribution", "unit_count": 6, "avg_hpd": 2.661, "avg_cph": 6.73, "total_annual_rate": 79113.12, "total_adj_spend": 75189.65, "flagged_count": 2, "cur_rank_vs_stores": 65, "total_store_ranks": 85, "pct_vs_store_avg": -19.5, "tier_vs_stores": "middle", "removal_count": 2, "proj_hpd": 3.991, "proj_rank_vs_stores": 8, "proj_savings": 24347.6, "removals": [{"asset": 382008, "type": "6K Yard Forklift", "hpd": 3.516, "cph": 5.34, "age_mo": 46.3, "proj_hours": 4163.6, "annual_rate": 12173.8, "adj_spend": 22243.0, "is_flagged": false, "new_dc_hpd": 3.193, "new_rank_vs_stores": 43, "new_type_hpd": null, "cumulative_savings": 12173.8, "trigger_type": "6K Yard Forklift", "is_manual_override": true}, {"asset": 382020, "type": "6K Yard Forklift", "hpd": 0.304, "cph": 20.46, "age_mo": 39.4, "proj_hours": 306.4, "annual_rate": 12173.8, "adj_spend": 6268.0, "is_flagged": true, "new_dc_hpd": 3.991, "new_rank_vs_stores": 8, "new_type_hpd": null, "cumulative_savings": 24347.6, "trigger_type": "6K Yard Forklift", "is_manual_override": true}]}, {"dc_label": "356", "name": "Midland Distribution Center", "region": "Distribution", "unit_count": 10, "avg_hpd": 2.468, "avg_cph": 14.82, "total_annual_rate": 143587.89, "total_adj_spend": 290153.0, "flagged_count": 5, "cur_rank_vs_stores": 74, "total_store_ranks": 85, "pct_vs_store_avg": -25.3, "tier_vs_stores": "bottom20", "removal_count": 3, "proj_hpd": 3.702, "proj_rank_vs_stores": 22, "proj_savings": 45479.54, "removals": [{"asset": 381058, "type": "8K Yard Forklift", "hpd": 1.895, "cph": 11.11, "age_mo": 48.5, "proj_hours": 2351.4, "annual_rate": 15416.93, "adj_spend": 26116.0, "is_flagged": true, "new_dc_hpd": 2.777, "new_rank_vs_stores": 61, "new_type_hpd": null, "cumulative_savings": 15416.93, "trigger_type": "8K Yard Forklift", "is_manual_override": true}, {"asset": 384096, "type": "8K Yard Forklift", "hpd": 3.159, "cph": 3.75, "age_mo": 14.9, "proj_hours": 1204.2, "annual_rate": 15416.93, "adj_spend": 4521.0, "is_flagged": false, "new_dc_hpd": 3.173, "new_rank_vs_stores": 44, "new_type_hpd": null, "cumulative_savings": 30833.86, "trigger_type": "8K Yard Forklift", "is_manual_override": true}, {"asset": 377071, "type": "11K Yard Forklift", "hpd": 2.343, "cph": 18.84, "age_mo": 99.9, "proj_hours": 5987.7, "annual_rate": 14645.68, "adj_spend": 112793.0, "is_flagged": true, "new_dc_hpd": 3.702, "new_rank_vs_stores": 22, "new_type_hpd": null, "cumulative_savings": 45479.54, "trigger_type": "11K Yard Forklift", "is_manual_override": true}]}, {"dc_label": "359", "name": "Burnet Reload", "region": "Distribution", "unit_count": 24, "avg_hpd": 4.21, "avg_cph": 11.05, "total_annual_rate": 392166.06, "total_adj_spend": 1092607.64, "flagged_count": 5, "cur_rank_vs_stores": 7, "total_store_ranks": 85, "pct_vs_store_avg": 27.4, "tier_vs_stores": "top20", "removal_count": 4, "proj_hpd": 5.2, "proj_rank_vs_stores": 1, "proj_savings": 63769.97, "removals": [{"asset": 381092, "type": "8K Yard Forklift", "hpd": 5.544, "cph": 4.03, "age_mo": 52.5, "proj_hours": 7444.9, "annual_rate": 15416.93, "adj_spend": 30016.0, "is_flagged": false, "new_dc_hpd": 4.42, "new_rank_vs_stores": 4, "new_type_hpd": null, "cumulative_savings": 15416.93, "trigger_type": "8K Yard Forklift", "is_manual_override": true}, {"asset": 381070, "type": "6K Yard Forklift", "hpd": 2.171, "cph": 2.89, "age_mo": 58.3, "proj_hours": 3237.6, "annual_rate": 12173.8, "adj_spend": 9353.0, "is_flagged": true, "new_dc_hpd": 4.653, "new_rank_vs_stores": 1, "new_type_hpd": null, "cumulative_savings": 27590.73, "trigger_type": "6K Yard Forklift", "is_manual_override": true}, {"asset": 119386, "type": "10K Yard Forklift", "hpd": 2.565, "cph": 14.52, "age_mo": 140.3, "proj_hours": 9206.0, "annual_rate": 15000.99, "adj_spend": 133629.72, "is_flagged": true, "new_dc_hpd": 4.911, "new_rank_vs_stores": 1, "new_type_hpd": null, "cumulative_savings": 42591.72, "trigger_type": "10K Yard Forklift", "is_manual_override": true}, {"asset": 380001, "type": "15.5K Yard Forklift", "hpd": 4.942, "cph": 16.31, "age_mo": 70.0, "proj_hours": 8850.0, "annual_rate": 21178.25, "adj_spend": 144303.0, "is_flagged": false, "new_dc_hpd": 5.2, "new_rank_vs_stores": 1, "new_type_hpd": null, "cumulative_savings": 63769.97, "trigger_type": "15.5K Yard Forklift", "is_manual_override": true}]}, {"dc_label": "479", "name": "Rebar Bender", "region": "Distribution", "unit_count": 1, "avg_hpd": 0, "avg_cph": 0, "total_annual_rate": 12093.54, "total_adj_spend": 0, "flagged_count": 0, "cur_rank_vs_stores": null, "total_store_ranks": 85, "pct_vs_store_avg": 0, "tier_vs_stores": "all_new", "removal_count": 0, "proj_hpd": null, "proj_rank_vs_stores": null, "proj_savings": 0, "removals": []}, {"dc_label": "489", "name": "EWP Program", "region": "Distribution", "unit_count": 9, "avg_hpd": 3.068, "avg_cph": 9.42, "total_annual_rate": 181099.37, "total_adj_spend": 641049.37, "flagged_count": 2, "cur_rank_vs_stores": 48, "total_store_ranks": 85, "pct_vs_store_avg": -7.1, "tier_vs_stores": "middle", "removal_count": 3, "proj_hpd": 4.603, "proj_rank_vs_stores": 3, "proj_savings": 59461.23, "removals": [{"asset": 377068, "type": "13K Yard Forklift", "hpd": 4.532, "cph": 13.2, "age_mo": 99.9, "proj_hours": 11582.3, "annual_rate": 19820.41, "adj_spend": 152858.63, "is_flagged": false, "new_dc_hpd": 3.452, "new_rank_vs_stores": 31, "new_type_hpd": null, "cumulative_savings": 19820.41, "trigger_type": "13K Yard Forklift", "is_manual_override": true}, {"asset": 377069, "type": "13K Yard Forklift", "hpd": 2.718, "cph": 29.75, "age_mo": 99.9, "proj_hours": 6946.1, "annual_rate": 19820.41, "adj_spend": 206675.64, "is_flagged": false, "new_dc_hpd": 3.945, "new_rank_vs_stores": 11, "new_type_hpd": null, "cumulative_savings": 39640.82, "trigger_type": "13K Yard Forklift", "is_manual_override": true}, {"asset": 377073, "type": "13K Yard Forklift", "hpd": 4.101, "cph": 25.55, "age_mo": 99.9, "proj_hours": 10480.4, "annual_rate": 19820.41, "adj_spend": 267721.85, "is_flagged": false, "new_dc_hpd": 4.603, "new_rank_vs_stores": 3, "new_type_hpd": null, "cumulative_savings": 59461.23, "trigger_type": "13K Yard Forklift", "is_manual_override": true}]}];
+const DC_ACTIVE = {"353": [{"store": "353", "store_num": 353.0, "store_name": "Dayton Distribution", "region": "Distribution", "store_label": "353 \u2014 Dayton Distribution", "asset": 382008, "type": "6K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2022-06-20", "age_mo": 46.3, "monthly_rate": 1014.48, "annual_rate": 12173.8, "known_spend": 22243.0, "adj_spend": 22243.0, "avg_mo_spend": 271.26, "proj_hours": 4163.6, "hpm": 89.89, "hpd": 3.516, "cph": 5.34, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-03-31", "reading_hours": 4137.0, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "353", "store_num": 353.0, "store_name": "Dayton Distribution", "region": "Distribution", "store_label": "353 \u2014 Dayton Distribution", "asset": 382009, "type": "6K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2022-07-29", "age_mo": 45.0, "monthly_rate": 1014.48, "annual_rate": 12173.8, "known_spend": 18995.78, "adj_spend": 18995.78, "avg_mo_spend": 231.66, "proj_hours": 4052.0, "hpm": 89.97, "hpd": 3.52, "cph": 4.69, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-04-08", "reading_hours": 4025.4, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "353", "store_num": 353.0, "store_name": "Dayton Distribution", "region": "Distribution", "store_label": "353 \u2014 Dayton Distribution", "asset": 382010, "type": "6K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2022-07-12", "age_mo": 45.6, "monthly_rate": 1014.48, "annual_rate": 12173.8, "known_spend": 18830.0, "adj_spend": 18830.0, "avg_mo_spend": 229.63, "proj_hours": 3948.0, "hpm": 86.58, "hpd": 3.385, "cph": 4.77, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2025-12-29", "reading_hours": 3922.4, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "353", "store_num": 353.0, "store_name": "Dayton Distribution", "region": "Distribution", "store_label": "353 \u2014 Dayton Distribution", "asset": 382020, "type": "6K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2023-01-17", "age_mo": 39.4, "monthly_rate": 1014.48, "annual_rate": 12173.8, "known_spend": 6268.0, "adj_spend": 6268.0, "avg_mo_spend": 76.44, "proj_hours": 306.4, "hpm": 7.78, "hpd": 0.304, "cph": 20.46, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-04-01", "reading_hours": 304.1, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": true}, {"store": "353", "store_num": 353.0, "store_name": "Dayton Distribution", "region": "Distribution", "store_label": "353 \u2014 Dayton Distribution", "asset": 384059, "type": "8K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2024-03-07", "age_mo": 25.8, "monthly_rate": 1284.74, "annual_rate": 15416.93, "known_spend": 6572.0, "adj_spend": 6572.0, "avg_mo_spend": 80.15, "proj_hours": 1924.8, "hpm": 74.73, "hpd": 2.917, "cph": 3.41, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-01-15", "reading_hours": 1902.7, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "353", "store_num": 353.0, "store_name": "Dayton Distribution", "region": "Distribution", "store_label": "353 \u2014 Dayton Distribution", "asset": 384103, "type": "10K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2024-06-17", "age_mo": 22.4, "monthly_rate": 1250.08, "annual_rate": 15000.99, "known_spend": 2280.87, "adj_spend": 2280.87, "avg_mo_spend": 27.82, "proj_hours": 1330.6, "hpm": 59.39, "hpd": 2.322, "cph": 1.71, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-04-13", "reading_hours": 1313.0, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": true}], "356": [{"store": "356", "store_num": 356.0, "store_name": "Midland Distribution Center", "region": "Distribution", "store_label": "356 \u2014 Midland Distribution Center", "asset": 377071, "type": "11K Yard Forklift", "function": "Distribution", "ownership": "Lease", "date_in": "2018-01-01", "age_mo": 99.9, "monthly_rate": 1220.47, "annual_rate": 14645.68, "known_spend": 93227.0, "adj_spend": 112793.0, "avg_mo_spend": 1375.52, "proj_hours": 5987.7, "hpm": 59.94, "hpd": 2.343, "cph": 18.84, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-01-15", "reading_hours": 5970.0, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": true}, {"store": "356", "store_num": 356.0, "store_name": "Midland Distribution Center", "region": "Distribution", "store_label": "356 \u2014 Midland Distribution Center", "asset": 381058, "type": "8K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2022-04-14", "age_mo": 48.5, "monthly_rate": 1284.74, "annual_rate": 15416.93, "known_spend": 26116.0, "adj_spend": 26116.0, "avg_mo_spend": 318.49, "proj_hours": 2351.4, "hpm": 48.5, "hpd": 1.895, "cph": 11.11, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-02-13", "reading_hours": 2337.1, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": true}, {"store": "356", "store_num": 356.0, "store_name": "Midland Distribution Center", "region": "Distribution", "store_label": "356 \u2014 Midland Distribution Center", "asset": 381089, "type": "10K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2022-05-31", "age_mo": 47.0, "monthly_rate": 1250.08, "annual_rate": 15000.99, "known_spend": 21017.0, "adj_spend": 21017.0, "avg_mo_spend": 256.3, "proj_hours": 1688.6, "hpm": 35.97, "hpd": 1.405, "cph": 12.45, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2025-12-09", "reading_hours": 1678.0, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": true}, {"store": "356", "store_num": 356.0, "store_name": "Midland Distribution Center", "region": "Distribution", "store_label": "356 \u2014 Midland Distribution Center", "asset": 382003, "type": "17.5K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2023-02-10", "age_mo": 38.6, "monthly_rate": 1612.81, "annual_rate": 19353.67, "known_spend": 15284.0, "adj_spend": 15284.0, "avg_mo_spend": 186.39, "proj_hours": 448.7, "hpm": 11.64, "hpd": 0.454, "cph": 34.06, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-01-15", "reading_hours": 445.3, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": true}, {"store": "356", "store_num": 356.0, "store_name": "Midland Distribution Center", "region": "Distribution", "store_label": "356 \u2014 Midland Distribution Center", "asset": 382005, "type": "6K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2022-07-12", "age_mo": 45.6, "monthly_rate": 1014.48, "annual_rate": 12173.8, "known_spend": 29683.0, "adj_spend": 29683.0, "avg_mo_spend": 361.99, "proj_hours": 5073.9, "hpm": 111.28, "hpd": 4.35, "cph": 5.85, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-03-26", "reading_hours": 5041.0, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "356", "store_num": 356.0, "store_name": "Midland Distribution Center", "region": "Distribution", "store_label": "356 \u2014 Midland Distribution Center", "asset": 382006, "type": "6K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2022-07-12", "age_mo": 45.6, "monthly_rate": 1014.48, "annual_rate": 12173.8, "known_spend": 43832.0, "adj_spend": 43832.0, "avg_mo_spend": 534.54, "proj_hours": 4931.4, "hpm": 108.15, "hpd": 4.228, "cph": 8.89, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-03-26", "reading_hours": 4899.4, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "356", "store_num": 356.0, "store_name": "Midland Distribution Center", "region": "Distribution", "store_label": "356 \u2014 Midland Distribution Center", "asset": 382007, "type": "6K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2022-07-12", "age_mo": 45.6, "monthly_rate": 1014.48, "annual_rate": 12173.8, "known_spend": 28495.0, "adj_spend": 28495.0, "avg_mo_spend": 347.5, "proj_hours": 4752.4, "hpm": 104.22, "hpd": 4.074, "cph": 6.0, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2025-12-18", "reading_hours": 4721.6, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "356", "store_num": 356.0, "store_name": "Midland Distribution Center", "region": "Distribution", "store_label": "356 \u2014 Midland Distribution Center", "asset": 383006, "type": "4K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2023-07-26", "age_mo": 33.1, "monthly_rate": 1261.56, "annual_rate": 15138.75, "known_spend": 8412.0, "adj_spend": 8412.0, "avg_mo_spend": 102.59, "proj_hours": 259.1, "hpm": 7.82, "hpd": 0.306, "cph": 32.47, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2025-12-18", "reading_hours": 256.8, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": true}, {"store": "356", "store_num": 356.0, "store_name": "Midland Distribution Center", "region": "Distribution", "store_label": "356 \u2014 Midland Distribution Center", "asset": 384096, "type": "8K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2025-01-31", "age_mo": 14.9, "monthly_rate": 1284.74, "annual_rate": 15416.93, "known_spend": 4521.0, "adj_spend": 4521.0, "avg_mo_spend": 55.13, "proj_hours": 1204.2, "hpm": 80.74, "hpd": 3.159, "cph": 3.75, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-03-27", "reading_hours": 1180.3, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "356", "store_num": 356.0, "store_name": "Midland Distribution Center", "region": "Distribution", "store_label": "356 \u2014 Midland Distribution Center", "asset": 386040, "type": "8K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2026-03-26", "age_mo": 1.1, "monthly_rate": 1007.8, "annual_rate": 12093.54, "known_spend": 0.0, "adj_spend": 0.0, "avg_mo_spend": 0.0, "proj_hours": null, "hpm": null, "hpd": null, "cph": null, "new_unit": true, "flagged": false, "flagged_40": false, "flagged_60_vs_store": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "new_unit", "reading_date": null, "reading_hours": null, "yt_per_op_hour": null}], "359": [{"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 119386, "type": "10K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2014-08-21", "age_mo": 140.3, "monthly_rate": 1250.08, "annual_rate": 15000.99, "known_spend": 77989.72, "adj_spend": 133629.72, "avg_mo_spend": 1629.63, "proj_hours": 9206.0, "hpm": 65.63, "hpd": 2.565, "cph": 14.52, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-01-30", "reading_hours": 9186.6, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": true}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 377074, "type": "13K Yard Forklift", "function": "Distribution", "ownership": "Lease", "date_in": "2018-01-01", "age_mo": 99.9, "monthly_rate": 1651.7, "annual_rate": 19820.41, "known_spend": 138341.0, "adj_spend": 167376.0, "avg_mo_spend": 2041.17, "proj_hours": 9991.1, "hpm": 99.95, "hpd": 3.91, "cph": 16.75, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "formula_projected", "reading_date": null, "reading_hours": 9961.5, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 381070, "type": "6K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2021-06-21", "age_mo": 58.3, "monthly_rate": 1014.48, "annual_rate": 12173.8, "known_spend": 9353.0, "adj_spend": 9353.0, "avg_mo_spend": 114.06, "proj_hours": 3237.6, "hpm": 55.55, "hpd": 2.171, "cph": 2.89, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-02-27", "reading_hours": 3221.2, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": true}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 381090, "type": "13K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2022-12-30", "age_mo": 40.0, "monthly_rate": 1651.7, "annual_rate": 19820.41, "known_spend": 27310.58, "adj_spend": 27310.58, "avg_mo_spend": 333.06, "proj_hours": 2965.9, "hpm": 74.18, "hpd": 2.899, "cph": 9.21, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-04-21", "reading_hours": 2944.0, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 381091, "type": "8K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2021-12-15", "age_mo": 52.5, "monthly_rate": 1284.74, "annual_rate": 15416.93, "known_spend": 33786.0, "adj_spend": 33786.0, "avg_mo_spend": 412.02, "proj_hours": 6155.7, "hpm": 117.33, "hpd": 4.584, "cph": 5.49, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-03-31", "reading_hours": 6121.0, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 381092, "type": "8K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2021-12-15", "age_mo": 52.5, "monthly_rate": 1284.74, "annual_rate": 15416.93, "known_spend": 30016.0, "adj_spend": 30016.0, "avg_mo_spend": 366.05, "proj_hours": 7444.9, "hpm": 141.9, "hpd": 5.544, "cph": 4.03, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-03-31", "reading_hours": 7402.9, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 381093, "type": "8K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2021-12-16", "age_mo": 52.4, "monthly_rate": 1284.74, "annual_rate": 15416.93, "known_spend": 21984.0, "adj_spend": 21984.0, "avg_mo_spend": 268.1, "proj_hours": 5852.5, "hpm": 111.62, "hpd": 4.366, "cph": 3.76, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-03-31", "reading_hours": 5819.5, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 382004, "type": "17.5K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2023-02-10", "age_mo": 38.6, "monthly_rate": 1612.81, "annual_rate": 19353.67, "known_spend": 22782.35, "adj_spend": 22782.35, "avg_mo_spend": 277.83, "proj_hours": 611.7, "hpm": 15.86, "hpd": 0.62, "cph": 37.24, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-02-06", "reading_hours": 607.0, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": true}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 384008, "type": "8K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2024-01-30", "age_mo": 27.0, "monthly_rate": 1284.74, "annual_rate": 15416.93, "known_spend": 22435.68, "adj_spend": 22435.68, "avg_mo_spend": 273.61, "proj_hours": 3128.5, "hpm": 115.99, "hpd": 4.53, "cph": 7.17, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2025-12-22", "reading_hours": 3094.2, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 384009, "type": "8K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2024-01-25", "age_mo": 27.1, "monthly_rate": 1284.74, "annual_rate": 15416.93, "known_spend": 20705.48, "adj_spend": 20705.48, "avg_mo_spend": 252.51, "proj_hours": 3492.1, "hpm": 128.69, "hpd": 5.038, "cph": 5.93, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-01-20", "reading_hours": 3454.1, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 384010, "type": "8K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2024-01-25", "age_mo": 27.1, "monthly_rate": 1284.74, "annual_rate": 15416.93, "known_spend": 22853.0, "adj_spend": 22853.0, "avg_mo_spend": 278.7, "proj_hours": 4836.5, "hpm": 178.24, "hpd": 6.977, "cph": 4.73, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-03-09", "reading_hours": 4783.8, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 384011, "type": "8K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2024-01-30", "age_mo": 27.0, "monthly_rate": 1284.74, "annual_rate": 15416.93, "known_spend": 13272.6, "adj_spend": 13272.6, "avg_mo_spend": 161.86, "proj_hours": 3295.9, "hpm": 122.2, "hpd": 4.772, "cph": 4.03, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-03-31", "reading_hours": 3259.8, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 384012, "type": "8K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2024-01-30", "age_mo": 27.0, "monthly_rate": 1284.74, "annual_rate": 15416.93, "known_spend": 25333.68, "adj_spend": 25333.68, "avg_mo_spend": 308.95, "proj_hours": 3789.1, "hpm": 140.49, "hpd": 5.486, "cph": 6.69, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-02-23", "reading_hours": 3747.6, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 384013, "type": "8K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2024-01-30", "age_mo": 27.0, "monthly_rate": 1284.74, "annual_rate": 15416.93, "known_spend": 39553.61, "adj_spend": 39553.61, "avg_mo_spend": 482.36, "proj_hours": 4579.7, "hpm": 169.8, "hpd": 6.631, "cph": 8.64, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-01-07", "reading_hours": 4529.5, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 384033, "type": "8K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2024-02-14", "age_mo": 26.5, "monthly_rate": 1284.74, "annual_rate": 15416.93, "known_spend": 21261.0, "adj_spend": 21261.0, "avg_mo_spend": 259.28, "proj_hours": 4163.4, "hpm": 157.24, "hpd": 6.142, "cph": 5.11, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-02-18", "reading_hours": 4116.9, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 384069, "type": "8K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2024-04-29", "age_mo": 24.0, "monthly_rate": 1284.74, "annual_rate": 15416.93, "known_spend": 35882.76, "adj_spend": 35882.76, "avg_mo_spend": 437.59, "proj_hours": 3322.5, "hpm": 138.36, "hpd": 5.412, "cph": 10.8, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-03-31", "reading_hours": 3281.6, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 384078, "type": "8K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2024-12-26", "age_mo": 16.1, "monthly_rate": 1284.74, "annual_rate": 15416.93, "known_spend": 6023.0, "adj_spend": 6023.0, "avg_mo_spend": 73.45, "proj_hours": 964.1, "hpm": 59.89, "hpd": 2.341, "cph": 6.25, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-03-23", "reading_hours": 946.4, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": true}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 380001, "type": "15.5K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2020-06-29", "age_mo": 70.0, "monthly_rate": 1764.85, "annual_rate": 21178.25, "known_spend": 144303.0, "adj_spend": 144303.0, "avg_mo_spend": 1759.79, "proj_hours": 8850.0, "hpm": 126.42, "hpd": 4.942, "cph": 16.31, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-02-27", "reading_hours": 8812.6, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 380002, "type": "15.5K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2020-06-29", "age_mo": 70.0, "monthly_rate": 1764.85, "annual_rate": 21178.25, "known_spend": 148457.09, "adj_spend": 148457.09, "avg_mo_spend": 1810.45, "proj_hours": 6277.1, "hpm": 89.66, "hpd": 3.506, "cph": 23.65, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "corrected_reading", "reading_date": "2025-09-05", "reading_hours": 6250.6, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 382001, "type": "15.5K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2022-12-30", "age_mo": 40.0, "monthly_rate": 1764.85, "annual_rate": 21178.25, "known_spend": 40423.17, "adj_spend": 40423.17, "avg_mo_spend": 492.97, "proj_hours": 1605.5, "hpm": 40.16, "hpd": 1.569, "cph": 25.18, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-04-13", "reading_hours": 1593.6, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": true}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 380003, "type": "15.5K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2020-07-30", "age_mo": 69.0, "monthly_rate": 1764.85, "annual_rate": 21178.25, "known_spend": 105865.92, "adj_spend": 105865.92, "avg_mo_spend": 1291.05, "proj_hours": 7763.3, "hpm": 112.53, "hpd": 4.398, "cph": 13.64, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-03-04", "reading_hours": 7730.0, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 386041, "type": "8K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2026-03-31", "age_mo": 1.0, "monthly_rate": 1007.8, "annual_rate": 12093.54, "known_spend": 0.0, "adj_spend": 0.0, "avg_mo_spend": 0.0, "proj_hours": null, "hpm": null, "hpd": null, "cph": null, "new_unit": true, "flagged": false, "flagged_40": false, "flagged_60_vs_store": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "new_unit", "reading_date": null, "reading_hours": null, "yt_per_op_hour": null}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 386043, "type": "10K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2026-05-06", "age_mo": -0.2, "monthly_rate": 1007.8, "annual_rate": 12093.54, "known_spend": 0.0, "adj_spend": 0.0, "avg_mo_spend": 0.0, "proj_hours": null, "hpm": null, "hpd": null, "cph": null, "new_unit": true, "flagged": false, "flagged_40": false, "flagged_60_vs_store": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "new_unit", "reading_date": null, "reading_hours": null, "yt_per_op_hour": null}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 386044, "type": "10K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2026-05-06", "age_mo": -0.2, "monthly_rate": 1007.8, "annual_rate": 12093.54, "known_spend": 0.0, "adj_spend": 0.0, "avg_mo_spend": 0.0, "proj_hours": null, "hpm": null, "hpd": null, "cph": null, "new_unit": true, "flagged": false, "flagged_40": false, "flagged_60_vs_store": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "new_unit", "reading_date": null, "reading_hours": null, "yt_per_op_hour": null}], "479": [{"store": "479", "store_num": 479.0, "store_name": "Rebar Bender", "region": "Distribution", "store_label": "479", "asset": 386042, "type": "10K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2026-05-15", "age_mo": -0.5, "monthly_rate": 1007.8, "annual_rate": 12093.54, "known_spend": 0.0, "adj_spend": 0.0, "avg_mo_spend": 0.0, "proj_hours": null, "hpm": null, "hpd": null, "cph": null, "new_unit": true, "flagged": false, "flagged_40": false, "flagged_60_vs_store": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "new_unit", "reading_date": null, "reading_hours": null, "yt_per_op_hour": null}], "489": [{"store": "489", "store_num": 489.0, "store_name": "EWP Program", "region": "Distribution", "store_label": "489 \u2014 EWP Program", "asset": 377068, "type": "13K Yard Forklift", "function": "Distribution", "ownership": "Lease", "date_in": "2018-01-01", "age_mo": 99.9, "monthly_rate": 1651.7, "annual_rate": 19820.41, "known_spend": 126415.63, "adj_spend": 152858.63, "avg_mo_spend": 1864.13, "proj_hours": 11582.3, "hpm": 115.94, "hpd": 4.532, "cph": 13.2, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2025-09-29", "reading_hours": 11548.0, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "489", "store_num": 489.0, "store_name": "EWP Program", "region": "Distribution", "store_label": "489 \u2014 EWP Program", "asset": 377069, "type": "13K Yard Forklift", "function": "Distribution", "ownership": "Lease", "date_in": "2018-01-01", "age_mo": 99.9, "monthly_rate": 1651.7, "annual_rate": 19820.41, "known_spend": 171437.64, "adj_spend": 206675.64, "avg_mo_spend": 2520.43, "proj_hours": 6946.1, "hpm": 69.53, "hpd": 2.718, "cph": 29.75, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2025-10-31", "reading_hours": 6925.5, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "489", "store_num": 489.0, "store_name": "EWP Program", "region": "Distribution", "store_label": "489 \u2014 EWP Program", "asset": 377073, "type": "13K Yard Forklift", "function": "Distribution", "ownership": "Lease", "date_in": "2018-01-01", "age_mo": 99.9, "monthly_rate": 1651.7, "annual_rate": 19820.41, "known_spend": 222835.85, "adj_spend": 267721.85, "avg_mo_spend": 3264.9, "proj_hours": 10480.4, "hpm": 104.85, "hpd": 4.101, "cph": 25.55, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "formula_projected", "reading_date": null, "reading_hours": 10449.4, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "489", "store_num": 489.0, "store_name": "EWP Program", "region": "Distribution", "store_label": "489 \u2014 EWP Program", "asset": 384105, "type": "13K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2024-07-23", "age_mo": 21.2, "monthly_rate": 1651.7, "annual_rate": 19820.41, "known_spend": 3107.0, "adj_spend": 3107.0, "avg_mo_spend": 37.89, "proj_hours": 1186.6, "hpm": 55.91, "hpd": 2.188, "cph": 2.62, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-04-13", "reading_hours": 1170.1, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": true}, {"store": "489", "store_num": 489.0, "store_name": "EWP Program", "region": "Distribution", "store_label": "489 \u2014 EWP Program", "asset": 385003, "type": "13K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2025-05-28", "age_mo": 11.1, "monthly_rate": 1651.7, "annual_rate": 19820.41, "known_spend": 2893.25, "adj_spend": 2893.25, "avg_mo_spend": 35.28, "proj_hours": 933.4, "hpm": 84.31, "hpd": 3.287, "cph": 3.1, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-02-24", "reading_hours": 908.5, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "489", "store_num": 489.0, "store_name": "EWP Program", "region": "Distribution", "store_label": "489 \u2014 EWP Program", "asset": 385004, "type": "13K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2025-05-28", "age_mo": 11.1, "monthly_rate": 1651.7, "annual_rate": 19820.41, "known_spend": 1435.0, "adj_spend": 1435.0, "avg_mo_spend": 17.5, "proj_hours": 804.4, "hpm": 72.65, "hpd": 2.833, "cph": 1.78, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-02-24", "reading_hours": 782.9, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "489", "store_num": 489.0, "store_name": "EWP Program", "region": "Distribution", "store_label": "489 \u2014 EWP Program", "asset": 385005, "type": "13K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2025-06-02", "age_mo": 10.9, "monthly_rate": 1651.7, "annual_rate": 19820.41, "known_spend": 2965.0, "adj_spend": 2965.0, "avg_mo_spend": 36.16, "proj_hours": 813.6, "hpm": 74.6, "hpd": 2.918, "cph": 3.64, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-02-18", "reading_hours": 791.5, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "489", "store_num": 489.0, "store_name": "EWP Program", "region": "Distribution", "store_label": "489 \u2014 EWP Program", "asset": 385002, "type": "15.5K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2025-06-06", "age_mo": 10.8, "monthly_rate": 1764.85, "annual_rate": 21178.25, "known_spend": 813.0, "adj_spend": 813.0, "avg_mo_spend": 9.91, "proj_hours": 760.9, "hpm": 70.62, "hpd": 2.754, "cph": 1.07, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-03-05", "reading_hours": 740.0, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "489", "store_num": 489.0, "store_name": "EWP Program", "region": "Distribution", "store_label": "489 \u2014 EWP Program", "asset": 385001, "type": "15.5K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2025-06-06", "age_mo": 10.8, "monthly_rate": 1764.85, "annual_rate": 21178.25, "known_spend": 2580.0, "adj_spend": 2580.0, "avg_mo_spend": 31.46, "proj_hours": 630.9, "hpm": 58.55, "hpd": 2.284, "cph": 4.09, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-03-05", "reading_hours": 613.6, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": true}]};
+const ASSET_DETAIL = [{"store": "353", "store_num": 353.0, "store_name": "Dayton Distribution", "region": "Distribution", "store_label": "353 \u2014 Dayton Distribution", "asset": 382008, "type": "6K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2022-06-20", "age_mo": 46.3, "monthly_rate": 1014.48, "annual_rate": 12173.8, "known_spend": 22243.0, "adj_spend": 22243.0, "avg_mo_spend": 271.26, "proj_hours": 4163.6, "hpm": 89.89, "hpd": 3.516, "cph": 5.34, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-03-31", "reading_hours": 4137.0, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "353", "store_num": 353.0, "store_name": "Dayton Distribution", "region": "Distribution", "store_label": "353 \u2014 Dayton Distribution", "asset": 382009, "type": "6K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2022-07-29", "age_mo": 45.0, "monthly_rate": 1014.48, "annual_rate": 12173.8, "known_spend": 18995.78, "adj_spend": 18995.78, "avg_mo_spend": 231.66, "proj_hours": 4052.0, "hpm": 89.97, "hpd": 3.52, "cph": 4.69, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-04-08", "reading_hours": 4025.4, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "353", "store_num": 353.0, "store_name": "Dayton Distribution", "region": "Distribution", "store_label": "353 \u2014 Dayton Distribution", "asset": 382010, "type": "6K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2022-07-12", "age_mo": 45.6, "monthly_rate": 1014.48, "annual_rate": 12173.8, "known_spend": 18830.0, "adj_spend": 18830.0, "avg_mo_spend": 229.63, "proj_hours": 3948.0, "hpm": 86.58, "hpd": 3.385, "cph": 4.77, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2025-12-29", "reading_hours": 3922.4, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "353", "store_num": 353.0, "store_name": "Dayton Distribution", "region": "Distribution", "store_label": "353 \u2014 Dayton Distribution", "asset": 382020, "type": "6K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2023-01-17", "age_mo": 39.4, "monthly_rate": 1014.48, "annual_rate": 12173.8, "known_spend": 6268.0, "adj_spend": 6268.0, "avg_mo_spend": 76.44, "proj_hours": 306.4, "hpm": 7.78, "hpd": 0.304, "cph": 20.46, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-04-01", "reading_hours": 304.1, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": true}, {"store": "353", "store_num": 353.0, "store_name": "Dayton Distribution", "region": "Distribution", "store_label": "353 \u2014 Dayton Distribution", "asset": 384059, "type": "8K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2024-03-07", "age_mo": 25.8, "monthly_rate": 1284.74, "annual_rate": 15416.93, "known_spend": 6572.0, "adj_spend": 6572.0, "avg_mo_spend": 80.15, "proj_hours": 1924.8, "hpm": 74.73, "hpd": 2.917, "cph": 3.41, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-01-15", "reading_hours": 1902.7, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "353", "store_num": 353.0, "store_name": "Dayton Distribution", "region": "Distribution", "store_label": "353 \u2014 Dayton Distribution", "asset": 384103, "type": "10K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2024-06-17", "age_mo": 22.4, "monthly_rate": 1250.08, "annual_rate": 15000.99, "known_spend": 2280.87, "adj_spend": 2280.87, "avg_mo_spend": 27.82, "proj_hours": 1330.6, "hpm": 59.39, "hpd": 2.322, "cph": 1.71, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-04-13", "reading_hours": 1313.0, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": true}, {"store": "356", "store_num": 356.0, "store_name": "Midland Distribution Center", "region": "Distribution", "store_label": "356 \u2014 Midland Distribution Center", "asset": 377071, "type": "11K Yard Forklift", "function": "Distribution", "ownership": "Lease", "date_in": "2018-01-01", "age_mo": 99.9, "monthly_rate": 1220.47, "annual_rate": 14645.68, "known_spend": 93227.0, "adj_spend": 112793.0, "avg_mo_spend": 1375.52, "proj_hours": 5987.7, "hpm": 59.94, "hpd": 2.343, "cph": 18.84, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-01-15", "reading_hours": 5970.0, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": true}, {"store": "356", "store_num": 356.0, "store_name": "Midland Distribution Center", "region": "Distribution", "store_label": "356 \u2014 Midland Distribution Center", "asset": 381058, "type": "8K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2022-04-14", "age_mo": 48.5, "monthly_rate": 1284.74, "annual_rate": 15416.93, "known_spend": 26116.0, "adj_spend": 26116.0, "avg_mo_spend": 318.49, "proj_hours": 2351.4, "hpm": 48.5, "hpd": 1.895, "cph": 11.11, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-02-13", "reading_hours": 2337.1, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": true}, {"store": "356", "store_num": 356.0, "store_name": "Midland Distribution Center", "region": "Distribution", "store_label": "356 \u2014 Midland Distribution Center", "asset": 381089, "type": "10K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2022-05-31", "age_mo": 47.0, "monthly_rate": 1250.08, "annual_rate": 15000.99, "known_spend": 21017.0, "adj_spend": 21017.0, "avg_mo_spend": 256.3, "proj_hours": 1688.6, "hpm": 35.97, "hpd": 1.405, "cph": 12.45, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2025-12-09", "reading_hours": 1678.0, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": true}, {"store": "356", "store_num": 356.0, "store_name": "Midland Distribution Center", "region": "Distribution", "store_label": "356 \u2014 Midland Distribution Center", "asset": 382003, "type": "17.5K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2023-02-10", "age_mo": 38.6, "monthly_rate": 1612.81, "annual_rate": 19353.67, "known_spend": 15284.0, "adj_spend": 15284.0, "avg_mo_spend": 186.39, "proj_hours": 448.7, "hpm": 11.64, "hpd": 0.454, "cph": 34.06, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-01-15", "reading_hours": 445.3, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": true}, {"store": "356", "store_num": 356.0, "store_name": "Midland Distribution Center", "region": "Distribution", "store_label": "356 \u2014 Midland Distribution Center", "asset": 382005, "type": "6K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2022-07-12", "age_mo": 45.6, "monthly_rate": 1014.48, "annual_rate": 12173.8, "known_spend": 29683.0, "adj_spend": 29683.0, "avg_mo_spend": 361.99, "proj_hours": 5073.9, "hpm": 111.28, "hpd": 4.35, "cph": 5.85, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-03-26", "reading_hours": 5041.0, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "356", "store_num": 356.0, "store_name": "Midland Distribution Center", "region": "Distribution", "store_label": "356 \u2014 Midland Distribution Center", "asset": 382006, "type": "6K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2022-07-12", "age_mo": 45.6, "monthly_rate": 1014.48, "annual_rate": 12173.8, "known_spend": 43832.0, "adj_spend": 43832.0, "avg_mo_spend": 534.54, "proj_hours": 4931.4, "hpm": 108.15, "hpd": 4.228, "cph": 8.89, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-03-26", "reading_hours": 4899.4, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "356", "store_num": 356.0, "store_name": "Midland Distribution Center", "region": "Distribution", "store_label": "356 \u2014 Midland Distribution Center", "asset": 382007, "type": "6K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2022-07-12", "age_mo": 45.6, "monthly_rate": 1014.48, "annual_rate": 12173.8, "known_spend": 28495.0, "adj_spend": 28495.0, "avg_mo_spend": 347.5, "proj_hours": 4752.4, "hpm": 104.22, "hpd": 4.074, "cph": 6.0, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2025-12-18", "reading_hours": 4721.6, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "356", "store_num": 356.0, "store_name": "Midland Distribution Center", "region": "Distribution", "store_label": "356 \u2014 Midland Distribution Center", "asset": 383006, "type": "4K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2023-07-26", "age_mo": 33.1, "monthly_rate": 1261.56, "annual_rate": 15138.75, "known_spend": 8412.0, "adj_spend": 8412.0, "avg_mo_spend": 102.59, "proj_hours": 259.1, "hpm": 7.82, "hpd": 0.306, "cph": 32.47, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2025-12-18", "reading_hours": 256.8, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": true}, {"store": "356", "store_num": 356.0, "store_name": "Midland Distribution Center", "region": "Distribution", "store_label": "356 \u2014 Midland Distribution Center", "asset": 384096, "type": "8K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2025-01-31", "age_mo": 14.9, "monthly_rate": 1284.74, "annual_rate": 15416.93, "known_spend": 4521.0, "adj_spend": 4521.0, "avg_mo_spend": 55.13, "proj_hours": 1204.2, "hpm": 80.74, "hpd": 3.159, "cph": 3.75, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-03-27", "reading_hours": 1180.3, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 119386, "type": "10K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2014-08-21", "age_mo": 140.3, "monthly_rate": 1250.08, "annual_rate": 15000.99, "known_spend": 77989.72, "adj_spend": 133629.72, "avg_mo_spend": 1629.63, "proj_hours": 9206.0, "hpm": 65.63, "hpd": 2.565, "cph": 14.52, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-01-30", "reading_hours": 9186.6, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": true}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 377074, "type": "13K Yard Forklift", "function": "Distribution", "ownership": "Lease", "date_in": "2018-01-01", "age_mo": 99.9, "monthly_rate": 1651.7, "annual_rate": 19820.41, "known_spend": 138341.0, "adj_spend": 167376.0, "avg_mo_spend": 2041.17, "proj_hours": 9991.1, "hpm": 99.95, "hpd": 3.91, "cph": 16.75, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "formula_projected", "reading_date": null, "reading_hours": 9961.5, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 381070, "type": "6K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2021-06-21", "age_mo": 58.3, "monthly_rate": 1014.48, "annual_rate": 12173.8, "known_spend": 9353.0, "adj_spend": 9353.0, "avg_mo_spend": 114.06, "proj_hours": 3237.6, "hpm": 55.55, "hpd": 2.171, "cph": 2.89, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-02-27", "reading_hours": 3221.2, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": true}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 381090, "type": "13K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2022-12-30", "age_mo": 40.0, "monthly_rate": 1651.7, "annual_rate": 19820.41, "known_spend": 27310.58, "adj_spend": 27310.58, "avg_mo_spend": 333.06, "proj_hours": 2965.9, "hpm": 74.18, "hpd": 2.899, "cph": 9.21, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-04-21", "reading_hours": 2944.0, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 381091, "type": "8K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2021-12-15", "age_mo": 52.5, "monthly_rate": 1284.74, "annual_rate": 15416.93, "known_spend": 33786.0, "adj_spend": 33786.0, "avg_mo_spend": 412.02, "proj_hours": 6155.7, "hpm": 117.33, "hpd": 4.584, "cph": 5.49, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-03-31", "reading_hours": 6121.0, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 381092, "type": "8K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2021-12-15", "age_mo": 52.5, "monthly_rate": 1284.74, "annual_rate": 15416.93, "known_spend": 30016.0, "adj_spend": 30016.0, "avg_mo_spend": 366.05, "proj_hours": 7444.9, "hpm": 141.9, "hpd": 5.544, "cph": 4.03, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-03-31", "reading_hours": 7402.9, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 381093, "type": "8K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2021-12-16", "age_mo": 52.4, "monthly_rate": 1284.74, "annual_rate": 15416.93, "known_spend": 21984.0, "adj_spend": 21984.0, "avg_mo_spend": 268.1, "proj_hours": 5852.5, "hpm": 111.62, "hpd": 4.366, "cph": 3.76, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-03-31", "reading_hours": 5819.5, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 382004, "type": "17.5K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2023-02-10", "age_mo": 38.6, "monthly_rate": 1612.81, "annual_rate": 19353.67, "known_spend": 22782.35, "adj_spend": 22782.35, "avg_mo_spend": 277.83, "proj_hours": 611.7, "hpm": 15.86, "hpd": 0.62, "cph": 37.24, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-02-06", "reading_hours": 607.0, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": true}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 384008, "type": "8K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2024-01-30", "age_mo": 27.0, "monthly_rate": 1284.74, "annual_rate": 15416.93, "known_spend": 22435.68, "adj_spend": 22435.68, "avg_mo_spend": 273.61, "proj_hours": 3128.5, "hpm": 115.99, "hpd": 4.53, "cph": 7.17, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2025-12-22", "reading_hours": 3094.2, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 384009, "type": "8K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2024-01-25", "age_mo": 27.1, "monthly_rate": 1284.74, "annual_rate": 15416.93, "known_spend": 20705.48, "adj_spend": 20705.48, "avg_mo_spend": 252.51, "proj_hours": 3492.1, "hpm": 128.69, "hpd": 5.038, "cph": 5.93, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-01-20", "reading_hours": 3454.1, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 384010, "type": "8K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2024-01-25", "age_mo": 27.1, "monthly_rate": 1284.74, "annual_rate": 15416.93, "known_spend": 22853.0, "adj_spend": 22853.0, "avg_mo_spend": 278.7, "proj_hours": 4836.5, "hpm": 178.24, "hpd": 6.977, "cph": 4.73, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-03-09", "reading_hours": 4783.8, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 384011, "type": "8K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2024-01-30", "age_mo": 27.0, "monthly_rate": 1284.74, "annual_rate": 15416.93, "known_spend": 13272.6, "adj_spend": 13272.6, "avg_mo_spend": 161.86, "proj_hours": 3295.9, "hpm": 122.2, "hpd": 4.772, "cph": 4.03, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-03-31", "reading_hours": 3259.8, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 384012, "type": "8K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2024-01-30", "age_mo": 27.0, "monthly_rate": 1284.74, "annual_rate": 15416.93, "known_spend": 25333.68, "adj_spend": 25333.68, "avg_mo_spend": 308.95, "proj_hours": 3789.1, "hpm": 140.49, "hpd": 5.486, "cph": 6.69, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-02-23", "reading_hours": 3747.6, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 384013, "type": "8K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2024-01-30", "age_mo": 27.0, "monthly_rate": 1284.74, "annual_rate": 15416.93, "known_spend": 39553.61, "adj_spend": 39553.61, "avg_mo_spend": 482.36, "proj_hours": 4579.7, "hpm": 169.8, "hpd": 6.631, "cph": 8.64, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-01-07", "reading_hours": 4529.5, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 384033, "type": "8K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2024-02-14", "age_mo": 26.5, "monthly_rate": 1284.74, "annual_rate": 15416.93, "known_spend": 21261.0, "adj_spend": 21261.0, "avg_mo_spend": 259.28, "proj_hours": 4163.4, "hpm": 157.24, "hpd": 6.142, "cph": 5.11, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-02-18", "reading_hours": 4116.9, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 384069, "type": "8K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2024-04-29", "age_mo": 24.0, "monthly_rate": 1284.74, "annual_rate": 15416.93, "known_spend": 35882.76, "adj_spend": 35882.76, "avg_mo_spend": 437.59, "proj_hours": 3322.5, "hpm": 138.36, "hpd": 5.412, "cph": 10.8, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-03-31", "reading_hours": 3281.6, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 384078, "type": "8K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2024-12-26", "age_mo": 16.1, "monthly_rate": 1284.74, "annual_rate": 15416.93, "known_spend": 6023.0, "adj_spend": 6023.0, "avg_mo_spend": 73.45, "proj_hours": 964.1, "hpm": 59.89, "hpd": 2.341, "cph": 6.25, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-03-23", "reading_hours": 946.4, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": true}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 380001, "type": "15.5K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2020-06-29", "age_mo": 70.0, "monthly_rate": 1764.85, "annual_rate": 21178.25, "known_spend": 144303.0, "adj_spend": 144303.0, "avg_mo_spend": 1759.79, "proj_hours": 8850.0, "hpm": 126.42, "hpd": 4.942, "cph": 16.31, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-02-27", "reading_hours": 8812.6, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 380002, "type": "15.5K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2020-06-29", "age_mo": 70.0, "monthly_rate": 1764.85, "annual_rate": 21178.25, "known_spend": 148457.09, "adj_spend": 148457.09, "avg_mo_spend": 1810.45, "proj_hours": 6277.1, "hpm": 89.66, "hpd": 3.506, "cph": 23.65, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "corrected_reading", "reading_date": "2025-09-05", "reading_hours": 6250.6, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 382001, "type": "15.5K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2022-12-30", "age_mo": 40.0, "monthly_rate": 1764.85, "annual_rate": 21178.25, "known_spend": 40423.17, "adj_spend": 40423.17, "avg_mo_spend": 492.97, "proj_hours": 1605.5, "hpm": 40.16, "hpd": 1.569, "cph": 25.18, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-04-13", "reading_hours": 1593.6, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": true}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 380003, "type": "15.5K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2020-07-30", "age_mo": 69.0, "monthly_rate": 1764.85, "annual_rate": 21178.25, "known_spend": 105865.92, "adj_spend": 105865.92, "avg_mo_spend": 1291.05, "proj_hours": 7763.3, "hpm": 112.53, "hpd": 4.398, "cph": 13.64, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-03-04", "reading_hours": 7730.0, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "489", "store_num": 489.0, "store_name": "EWP Program", "region": "Distribution", "store_label": "489 \u2014 EWP Program", "asset": 377068, "type": "13K Yard Forklift", "function": "Distribution", "ownership": "Lease", "date_in": "2018-01-01", "age_mo": 99.9, "monthly_rate": 1651.7, "annual_rate": 19820.41, "known_spend": 126415.63, "adj_spend": 152858.63, "avg_mo_spend": 1864.13, "proj_hours": 11582.3, "hpm": 115.94, "hpd": 4.532, "cph": 13.2, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2025-09-29", "reading_hours": 11548.0, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "489", "store_num": 489.0, "store_name": "EWP Program", "region": "Distribution", "store_label": "489 \u2014 EWP Program", "asset": 377069, "type": "13K Yard Forklift", "function": "Distribution", "ownership": "Lease", "date_in": "2018-01-01", "age_mo": 99.9, "monthly_rate": 1651.7, "annual_rate": 19820.41, "known_spend": 171437.64, "adj_spend": 206675.64, "avg_mo_spend": 2520.43, "proj_hours": 6946.1, "hpm": 69.53, "hpd": 2.718, "cph": 29.75, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2025-10-31", "reading_hours": 6925.5, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "489", "store_num": 489.0, "store_name": "EWP Program", "region": "Distribution", "store_label": "489 \u2014 EWP Program", "asset": 377073, "type": "13K Yard Forklift", "function": "Distribution", "ownership": "Lease", "date_in": "2018-01-01", "age_mo": 99.9, "monthly_rate": 1651.7, "annual_rate": 19820.41, "known_spend": 222835.85, "adj_spend": 267721.85, "avg_mo_spend": 3264.9, "proj_hours": 10480.4, "hpm": 104.85, "hpd": 4.101, "cph": 25.55, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "formula_projected", "reading_date": null, "reading_hours": 10449.4, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "489", "store_num": 489.0, "store_name": "EWP Program", "region": "Distribution", "store_label": "489 \u2014 EWP Program", "asset": 384105, "type": "13K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2024-07-23", "age_mo": 21.2, "monthly_rate": 1651.7, "annual_rate": 19820.41, "known_spend": 3107.0, "adj_spend": 3107.0, "avg_mo_spend": 37.89, "proj_hours": 1186.6, "hpm": 55.91, "hpd": 2.188, "cph": 2.62, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-04-13", "reading_hours": 1170.1, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": true}, {"store": "489", "store_num": 489.0, "store_name": "EWP Program", "region": "Distribution", "store_label": "489 \u2014 EWP Program", "asset": 385003, "type": "13K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2025-05-28", "age_mo": 11.1, "monthly_rate": 1651.7, "annual_rate": 19820.41, "known_spend": 2893.25, "adj_spend": 2893.25, "avg_mo_spend": 35.28, "proj_hours": 933.4, "hpm": 84.31, "hpd": 3.287, "cph": 3.1, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-02-24", "reading_hours": 908.5, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "489", "store_num": 489.0, "store_name": "EWP Program", "region": "Distribution", "store_label": "489 \u2014 EWP Program", "asset": 385004, "type": "13K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2025-05-28", "age_mo": 11.1, "monthly_rate": 1651.7, "annual_rate": 19820.41, "known_spend": 1435.0, "adj_spend": 1435.0, "avg_mo_spend": 17.5, "proj_hours": 804.4, "hpm": 72.65, "hpd": 2.833, "cph": 1.78, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-02-24", "reading_hours": 782.9, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "489", "store_num": 489.0, "store_name": "EWP Program", "region": "Distribution", "store_label": "489 \u2014 EWP Program", "asset": 385005, "type": "13K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2025-06-02", "age_mo": 10.9, "monthly_rate": 1651.7, "annual_rate": 19820.41, "known_spend": 2965.0, "adj_spend": 2965.0, "avg_mo_spend": 36.16, "proj_hours": 813.6, "hpm": 74.6, "hpd": 2.918, "cph": 3.64, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-02-18", "reading_hours": 791.5, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "489", "store_num": 489.0, "store_name": "EWP Program", "region": "Distribution", "store_label": "489 \u2014 EWP Program", "asset": 385002, "type": "15.5K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2025-06-06", "age_mo": 10.8, "monthly_rate": 1764.85, "annual_rate": 21178.25, "known_spend": 813.0, "adj_spend": 813.0, "avg_mo_spend": 9.91, "proj_hours": 760.9, "hpm": 70.62, "hpd": 2.754, "cph": 1.07, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-03-05", "reading_hours": 740.0, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": false}, {"store": "489", "store_num": 489.0, "store_name": "EWP Program", "region": "Distribution", "store_label": "489 \u2014 EWP Program", "asset": 385001, "type": "15.5K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2025-06-06", "age_mo": 10.8, "monthly_rate": 1764.85, "annual_rate": 21178.25, "known_spend": 2580.0, "adj_spend": 2580.0, "avg_mo_spend": 31.46, "proj_hours": 630.9, "hpm": 58.55, "hpd": 2.284, "cph": 4.09, "new_unit": false, "flagged": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "actual_reading", "reading_date": "2026-03-05", "reading_hours": 613.6, "flagged_40": false, "yt_per_op_hour": null, "flagged_60_vs_store": true}, {"store": "356", "store_num": 356.0, "store_name": "Midland Distribution Center", "region": "Distribution", "store_label": "356 \u2014 Midland Distribution Center", "asset": 386040, "type": "8K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2026-03-26", "age_mo": 1.1, "monthly_rate": 1007.8, "annual_rate": 12093.54, "known_spend": 0.0, "adj_spend": 0.0, "avg_mo_spend": 0.0, "proj_hours": null, "hpm": null, "hpd": null, "cph": null, "new_unit": true, "flagged": false, "flagged_40": false, "flagged_60_vs_store": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "new_unit", "reading_date": null, "reading_hours": null, "yt_per_op_hour": null}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 386041, "type": "8K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2026-03-31", "age_mo": 1.0, "monthly_rate": 1007.8, "annual_rate": 12093.54, "known_spend": 0.0, "adj_spend": 0.0, "avg_mo_spend": 0.0, "proj_hours": null, "hpm": null, "hpd": null, "cph": null, "new_unit": true, "flagged": false, "flagged_40": false, "flagged_60_vs_store": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "new_unit", "reading_date": null, "reading_hours": null, "yt_per_op_hour": null}, {"store": "479", "store_num": 479.0, "store_name": "Rebar Bender", "region": "Distribution", "store_label": "479", "asset": 386042, "type": "10K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2026-05-15", "age_mo": -0.5, "monthly_rate": 1007.8, "annual_rate": 12093.54, "known_spend": 0.0, "adj_spend": 0.0, "avg_mo_spend": 0.0, "proj_hours": null, "hpm": null, "hpd": null, "cph": null, "new_unit": true, "flagged": false, "flagged_40": false, "flagged_60_vs_store": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "new_unit", "reading_date": null, "reading_hours": null, "yt_per_op_hour": null}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 386043, "type": "10K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2026-05-06", "age_mo": -0.2, "monthly_rate": 1007.8, "annual_rate": 12093.54, "known_spend": 0.0, "adj_spend": 0.0, "avg_mo_spend": 0.0, "proj_hours": null, "hpm": null, "hpd": null, "cph": null, "new_unit": true, "flagged": false, "flagged_40": false, "flagged_60_vs_store": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "new_unit", "reading_date": null, "reading_hours": null, "yt_per_op_hour": null}, {"store": "359", "store_num": 359.0, "store_name": "Burnet Reload", "region": "Distribution", "store_label": "359 \u2014 Burnet Reload", "asset": 386044, "type": "10K Yard Forklift", "function": "Distribution", "ownership": "Owned", "date_in": "2026-05-06", "age_mo": -0.2, "monthly_rate": 1007.8, "annual_rate": 12093.54, "known_spend": 0.0, "adj_spend": 0.0, "avg_mo_spend": 0.0, "proj_hours": null, "hpm": null, "hpd": null, "cph": null, "new_unit": true, "flagged": false, "flagged_40": false, "flagged_60_vs_store": false, "ys_12mo": null, "ys_unit_bday": null, "hour_method": "new_unit", "reading_date": null, "reading_hours": null, "yt_per_op_hour": null}];
+const BENCHMARKS = {"store_avg_hpd": 3.304, "store_avg_cph": 5.39, "store_avg_ys": 9.16, "dist_avg_hpd": 3.337, "dist_avg_cph": 11.5, "mw_avg_hpd": 3.773, "store_flag_threshold": 1.652, "dist_flag_threshold": 1.669, "mw_flag_threshold": 1.887, "bdays_per_month": 25.58, "data_as_of": "2026-04-30", "last_reading_date": "2026-04-30", "fleet_avg_hpd": 3.315};
+const TOTAL_STORES = 85;
+const THRESHOLD_60 = 2.643;
+
+function showTab(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  event.target.classList.add('active');
+  if (name === 'dcs' && !window._dcsBuilt) { renderDCList(); window._dcsBuilt = true; }
+  if (name === 'assets' && !window._assetsBuilt) { setupAssetFilters(); renderAssetTable(); window._assetsBuilt = true; }
+}
+
+function tierBadge(tier) {
+  if (tier === 'top20') return '<span class="badge badge-green">Top 20</span>';
+  if (tier === 'bottom20') return '<span class="badge badge-red">Bottom 20</span>';
+  if (tier === 'middle') return '<span class="badge" style="background:#FFF7DB;color:#856404;border:1px solid #FFC107">Middle</span>';
+  if (tier === 'all_new') return '<span class="badge" style="background:#E8F0FE;color:#1A56DB;border:1px solid #4F86F7">New Unit Only</span>';
+  return '';
+}
+
+function renderDCList() {
+  const container = document.getElementById('dc-list');
+  // Sort by rank vs stores (worst first - those are the ones to make case for)
+  const sorted = [...DC_SUMMARY].sort((a, b) => b.cur_rank_vs_stores - a.cur_rank_vs_stores);
+  
+  container.innerHTML = sorted.map(d => {
+    const actives = DC_ACTIVE[d.dc_label] || [];
+    const assetsSorted = [...actives].sort((a, b) => (b.age_mo || 0) - (a.age_mo || 0));
+    const removalAssets = new Set((d.removals || []).map(r => r.asset));
+    
+    const headerColor = d.tier_vs_stores === 'bottom20' ? '#C0392B' : (d.tier_vs_stores === 'top20' ? 'var(--green)' : 'var(--dark)');
+    const pctColor = d.pct_vs_store_avg > 0 ? 'var(--green)' : '#C0392B';
+    const pctSign = d.pct_vs_store_avg > 0 ? '+' : '';
+    
+    let removalRows = '';
+    if (d.removals && d.removals.length > 0) {
+      removalRows = `
+        <div style="background:#FFFBE6;border-left:3px solid var(--yellow);padding:12px 16px;margin-top:14px;border-radius:6px">
+          <strong style="font-size:13px;color:var(--dark)">Recommended Removals</strong>
+          <table style="width:100%;margin-top:8px;font-size:12px">
+            <thead><tr style="background:transparent">
+              <th style="background:transparent;color:var(--dark);text-align:left">Asset</th>
+              <th style="background:transparent;color:var(--dark)">Type</th>
+              <th style="background:transparent;color:var(--dark)">Age (mo)</th>
+              <th style="background:transparent;color:var(--dark)">HPD</th>
+              <th style="background:transparent;color:var(--dark)">Cost/Hr</th>
+              <th style="background:transparent;color:var(--dark)">Annual Savings</th>
+              <th style="background:transparent;color:var(--dark)">Triggered By Type</th>
+            </tr></thead>
+            <tbody>
+              ${d.removals.map(r => `
+                <tr>
+                  <td style="text-align:left"><strong>${r.asset}</strong></td>
+                  <td style="text-align:left">${r.type}</td>
+                  <td>${Math.round(r.age_mo)}</td>
+                  <td>${r.hpd.toFixed(2)}</td>
+                  <td>$${r.cph ? r.cph.toFixed(2) : '—'}</td>
+                  <td><strong style="color:var(--green)">$${Math.round(r.annual_rate).toLocaleString()}/yr</strong></td>
+                  <td style="text-align:left;font-size:11px;color:var(--gray-4)">${r.trigger_type === r.type ? 'Self-pool' : r.trigger_type}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--yellow);font-size:12px">
+            <strong>Total: ${d.removal_count} unit${d.removal_count > 1 ? 's' : ''} · $${Math.round(d.proj_savings).toLocaleString()}/yr savings</strong>
+            &nbsp;·&nbsp; Projected HPD: <strong>${d.proj_hpd}</strong> (rank ${d.proj_rank_vs_stores}/${TOTAL_STORES} vs stores)
+          </div>
+        </div>
+      `;
+    } else if (d.flagged_count > 0) {
+      removalRows = `
+        <div style="background:#FFF7DB;border-left:3px solid var(--yellow);padding:10px 14px;margin-top:14px;border-radius:6px;font-size:12px;color:var(--gray-4)">
+          ${d.flagged_count} flagged unit(s) at this DC, but no removable candidate of the same type class (single unit of type or other constraint).
+        </div>
+      `;
+    }
+    
+    return `
+      <div class="store-block" style="margin-bottom:18px">
+        <div class="store-header" onclick="toggleDC('${d.dc_label}')" style="cursor:pointer">
+          <div style="display:flex;align-items:center;gap:14px;flex:1">
+            <span class="chev" id="chev-${d.dc_label}">▶</span>
+            <div>
+              <div style="font-size:15px;font-weight:600;color:${headerColor}">${d.dc_label} — ${d.name}</div>
+              <div style="font-size:11px;color:var(--gray-3);margin-top:2px">${d.region} · ${d.unit_count} units · Avg HPD ${d.avg_hpd} · Avg CPH $${d.avg_cph}</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:18px">
+            <div style="text-align:right;font-size:12px">
+              <div style="color:var(--gray-3);font-size:10px">Rank vs Stores</div>
+              <div style="font-weight:700;color:${headerColor};font-size:16px">${d.cur_rank_vs_stores ? `${d.cur_rank_vs_stores} / ${TOTAL_STORES}` : '—'}</div>
+              <div>${d.cur_rank_vs_stores ? `<span style="color:${pctColor};font-size:11px;font-weight:600">${pctSign}${d.pct_vs_store_avg}%</span> vs store avg` : '<span style="color:var(--gray-3);font-size:11px">no analysis data yet</span>'}</div>
+            </div>
+            ${tierBadge(d.tier_vs_stores)}
+            ${d.flagged_count > 0 ? `<span class="badge badge-red">${d.flagged_count} flagged</span>` : ''}
+          </div>
+        </div>
+        <div class="store-assets" id="assets-${d.dc_label}">
+          <table style="width:100%;font-size:12px">
+            <thead><tr>
+              <th style="text-align:left">Asset</th>
+              <th>Type</th>
+              <th>Own</th>
+              <th>Age (mo)</th>
+              <th>HPD</th>
+              <th>vs Store Avg</th>
+              <th>Cost/Hr</th>
+              <th>Lifetime Maint</th>
+              <th>Annual Rate</th>
+              <th>Status</th>
+            </tr></thead>
+            <tbody>
+              ${assetsSorted.map(a => {
+                const vsAvg = a.hpd != null ? ((a.hpd - BENCHMARKS.store_avg_hpd) / BENCHMARKS.store_avg_hpd * 100).toFixed(1) : 0;
+                const vsColor = vsAvg > 0 ? 'var(--green)' : '#C0392B';
+                const isFlagged = a.flagged_60_vs_store;
+                const isRemoval = removalAssets.has(a.asset);
+                const rowStyle = isRemoval ? 'background:#FFF8E1' : '';
+                let statusHtml = '';
+                if (isRemoval) statusHtml = '<span class="badge badge-red">REMOVE</span>';
+                else if (a.new_unit) statusHtml = '<span class="badge" style="background:#E8F0FE;color:#1A56DB;border:1px solid #4F86F7">New · Insufficient Data</span>';
+                else if (isFlagged) statusHtml = '<span class="badge badge-yellow">Flagged</span>';
+                return `<tr style="${rowStyle}">
+                  <td style="text-align:left"><strong>${a.asset}</strong></td>
+                  <td>${a.type}</td>
+                  <td>${a.ownership}</td>
+                  <td>${Math.round(a.age_mo || 0)}</td>
+                  <td>${a.hpd != null ? a.hpd.toFixed(2) : '<span style="color:var(--gray-3)">—</span>'}</td>
+                  <td>${a.hpd != null ? `<span style="color:${vsColor};font-weight:600">${vsAvg > 0 ? '+' : ''}${vsAvg}%</span>` : '<span style="color:var(--gray-3)">—</span>'}</td>
+                  <td>$${a.cph ? a.cph.toFixed(2) : '—'}</td>
+                  <td>$${Math.round(a.adj_spend || 0).toLocaleString()}</td>
+                  <td>$${Math.round(a.annual_rate || 0).toLocaleString()}/yr</td>
+                  <td>${statusHtml}</td>
+                </tr>`;
+              }).join('')}
+            </tbody>
+          </table>
+          ${removalRows}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function toggleDC(label) {
+  const assets = document.getElementById('assets-' + label);
+  const chev = document.getElementById('chev-' + label);
+  if (!assets) return;
+  const isOpen = assets.classList.contains('open');
+  assets.classList.toggle('open', !isOpen);
+  chev.classList.toggle('open', !isOpen);
+}
+
+function setupAssetFilters() {
+  const typeSelect = document.getElementById('asset-type-filter');
+  const types = [...new Set(ASSET_DETAIL.map(a => a.type))].sort();
+  typeSelect.innerHTML = '<option value="">All</option>' + types.map(t => `<option value="${t}">${t}</option>`).join('');
+}
+
+function renderAssetTable() {
+  const dcFilter = document.getElementById('asset-dc-filter').value;
+  const typeFilter = document.getElementById('asset-type-filter').value;
+  const flaggedOnly = document.getElementById('asset-flagged-only').checked;
+  
+  let rows = ASSET_DETAIL.filter(a => {
+    if (dcFilter && String(a.store) !== dcFilter) return false;
+    if (typeFilter && a.type !== typeFilter) return false;
+    if (flaggedOnly && !a.flagged_60_vs_store) return false;
+    return true;
+  });
+  rows.sort((a, b) => {
+    if (String(a.store) !== String(b.store)) return String(a.store).localeCompare(String(b.store));
+    return (b.hpd || 0) - (a.hpd || 0);
+  });
+  
+  document.getElementById('asset-count').textContent = `${rows.length} asset${rows.length !== 1 ? 's' : ''}`;
+  document.getElementById('asset-table').innerHTML = rows.map(a => {
+    const vsAvg = a.hpd != null ? ((a.hpd - BENCHMARKS.store_avg_hpd) / BENCHMARKS.store_avg_hpd * 100).toFixed(1) : 0;
+    const vsColor = vsAvg > 0 ? 'var(--green)' : '#C0392B';
+    return `<tr ${a.flagged_60_vs_store ? 'style="background:#FFF8E1"' : ''}>
+      <td><strong>${a.store}</strong></td>
+      <td><strong>${a.asset}</strong></td>
+      <td style="text-align:left">${a.type}</td>
+      <td>${a.ownership}</td>
+      <td>${Math.round(a.age_mo || 0)}</td>
+      <td>${a.hpd != null ? a.hpd.toFixed(2) : '<span style="color:var(--gray-3)">—</span>'}</td>
+      <td>${a.hpd != null ? `<span style="color:${vsColor};font-weight:600">${vsAvg > 0 ? '+' : ''}${vsAvg}%</span>` : '<span style="color:var(--gray-3)">—</span>'}</td>
+      <td>$${a.cph ? a.cph.toFixed(2) : '—'}</td>
+      <td>$${Math.round(a.adj_spend || 0).toLocaleString()}</td>
+      <td>$${Math.round(a.avg_mo_spend || 0).toLocaleString()}</td>
+      <td>$${Math.round(a.annual_rate || 0).toLocaleString()}/yr</td>
+      <td>${a.new_unit ? '<span class="badge" style="background:#E8F0FE;color:#1A56DB;border:1px solid #4F86F7">New</span>' : (a.flagged_60_vs_store ? '<span class="badge badge-red">Flagged</span>' : '')}</td>
+    </tr>`;
+  }).join('');
+}
+
+</script>
+
+</body>
+</html>
