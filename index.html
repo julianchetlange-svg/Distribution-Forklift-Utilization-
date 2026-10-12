@@ -321,6 +321,8 @@
       <div><div class="section-hdr"><h2>Chronic Meter Rejections</h2></div><div class="card"><div class="tbl-wrap"><table id="chronicTable"></table></div></div></div>
       <div><div class="section-hdr"><h2>Unknown Units</h2></div><div class="card"><div class="tbl-wrap"><table id="unknownTable"></table></div></div></div>
     </div>
+    <div class="section-hdr"><h2>Left the Fleet</h2></div>
+    <div class="card"><div class="tbl-wrap"><table id="departedTable"></table></div></div>
     <div class="section-hdr"><h2>Excluded from Scope</h2></div>
     <div class="card"><div class="tbl-wrap"><table id="excludedTable"></table></div></div>
   </section>
@@ -363,7 +365,7 @@ const DIST_META = {
   // To compare against a fixed figure instead: { type: 'fixed', label: 'Store fleet average', hpd: <number> }
   locations: [
     { id: '353', name: 'Dayton Distribution',          roster_units: 6  },
-    { id: '356', name: 'Midland Distribution Center',  roster_units: 10 },
+    { id: '356', name: 'Midland Distribution Center',  roster_units: 9 },   // 10 on the 10/5 roster; 377071 left 10/12/2026
     { id: '359', name: 'Burnet Reload',                roster_units: 26 },
     { id: '489', name: 'EWP Program',                  roster_units: 10 },
     { id: '479', name: 'Rebar Bender',                 roster_units: 0  }
@@ -394,7 +396,6 @@ const DIST_ASSET_DETAIL = [
   {"loc": "353", "asset": "382020", "type": "6K Yard Forklift", "class": "Forklift", "mfr": "Toyota", "ownership": "Company Owned", "date_in": "2023-01-17", "reading_hours": 340.6, "reading_date": "2026-09-30", "accepted_readings": 31, "reading_note": null, "latest_reported_hours": 340.6, "latest_reported_date": "2026-09-30", "lifetime_spend": 9816.63, "dvir_status": "Validated", "known_spend": 9816.63, "spend_invoices": 17, "spend_note": null, "hold_note": null, "monthly_depreciation": 539.39, "depreciation_asset_id": "BA-048841", "depreciation_note": null, "monthly_lease": null, "pm_window_spend": 890.75, "pm_window_invoices": 4, "lifetime_pm_spend": 2001.91},
   {"loc": "353", "asset": "384059", "type": "8K Yard Forklift", "class": "Forklift", "mfr": "Toyota", "ownership": "Company Owned", "date_in": "2024-03-07", "reading_hours": 2116.3, "reading_date": "2026-09-30", "accepted_readings": 31, "reading_note": null, "latest_reported_hours": 2116.3, "latest_reported_date": "2026-09-30", "lifetime_spend": 7965.27, "dvir_status": "Validated", "known_spend": 7965.27, "spend_invoices": 15, "spend_note": null, "hold_note": null, "monthly_depreciation": 717.65, "depreciation_asset_id": "BA-050407", "depreciation_note": null, "monthly_lease": null, "pm_window_spend": 778.52, "pm_window_invoices": 3, "lifetime_pm_spend": 1733.75},
   {"loc": "353", "asset": "384103", "type": "10K Yard Forklift", "class": "Forklift", "mfr": "Toyota", "ownership": "Company Owned", "date_in": "2024-06-17", "reading_hours": 1628.3, "reading_date": "2026-09-30", "accepted_readings": 32, "reading_note": null, "latest_reported_hours": 1628.3, "latest_reported_date": "2026-09-30", "lifetime_spend": 2629.32, "dvir_status": "Validated", "known_spend": 2629.32, "spend_invoices": 7, "spend_note": null, "hold_note": null, "monthly_depreciation": 815.77, "depreciation_asset_id": "BA-050915", "depreciation_note": null, "monthly_lease": null, "pm_window_spend": 1148.93, "pm_window_invoices": 4, "lifetime_pm_spend": 1742.62},
-  {"loc": "356", "asset": "377071", "type": "11K Yard Forklift", "class": "Forklift", "mfr": "Toyota", "ownership": "Operating Lease", "date_in": "2018-01-01", "reading_hours": 6313.1, "reading_date": "2026-09-23", "accepted_readings": 21, "reading_note": null, "latest_reported_hours": 6313.1, "latest_reported_date": "2026-09-23", "lifetime_spend": 133674.43, "dvir_status": "Stale", "known_spend": 111116.35, "spend_invoices": 62, "spend_note": "Pro-rated \u00d71.203: in service 01/01/2018, spend data starts 6/24/2019", "hold_note": null, "monthly_depreciation": 0.0, "depreciation_asset_id": null, "depreciation_note": null, "monthly_lease": 398.0, "pm_window_spend": 1394.86, "pm_window_invoices": 3, "lifetime_pm_spend": 6860.08},
   {"loc": "356", "asset": "381058", "type": "8K Yard Forklift", "class": "Forklift", "mfr": "Heli", "ownership": "Company Owned", "date_in": "2022-04-14", "reading_hours": 2621.6, "reading_date": "2026-09-30", "accepted_readings": 30, "reading_note": null, "latest_reported_hours": 2621.6, "latest_reported_date": "2026-09-30", "lifetime_spend": 12396.69, "dvir_status": "Validated", "known_spend": 12396.69, "spend_invoices": 19, "spend_note": null, "hold_note": null, "monthly_depreciation": 571.48, "depreciation_asset_id": "BA-047538", "depreciation_note": null, "monthly_lease": null, "pm_window_spend": 2232.57, "pm_window_invoices": 4, "lifetime_pm_spend": 2894.51},
   {"loc": "356", "asset": "381089", "type": "10K Yard Forklift", "class": "Forklift", "mfr": "Heli", "ownership": "Company Owned", "date_in": "2022-05-31", "reading_hours": 1992.9, "reading_date": "2026-09-30", "accepted_readings": 29, "reading_note": null, "latest_reported_hours": 1992.9, "latest_reported_date": "2026-09-30", "lifetime_spend": 29160.28, "dvir_status": "Validated", "known_spend": 29160.28, "spend_invoices": 32, "spend_note": null, "hold_note": null, "monthly_depreciation": 637.53, "depreciation_asset_id": "BA-047540", "depreciation_note": null, "monthly_lease": null, "pm_window_spend": 1989.69, "pm_window_invoices": 4, "lifetime_pm_spend": 4702.26},
   {"loc": "356", "asset": "382003", "type": "17.5K Yard Forklift", "class": "Forklift", "mfr": "Heli", "ownership": "Company Owned", "date_in": "2023-02-10", "reading_hours": 820.0, "reading_date": "2026-09-30", "accepted_readings": 31, "reading_note": null, "latest_reported_hours": 820.0, "latest_reported_date": "2026-09-30", "lifetime_spend": 25728.36, "dvir_status": "Validated", "known_spend": 25728.36, "spend_invoices": 24, "spend_note": null, "hold_note": null, "monthly_depreciation": 981.91, "depreciation_asset_id": "BA-049048", "depreciation_note": null, "monthly_lease": null, "pm_window_spend": 2675.06, "pm_window_invoices": 6, "removal_override": "Approved for removal although it is the only 17.5K at 356: runs 0.73 HPD (Chet, 10/9/2026).", "lifetime_pm_spend": 3970.51},
@@ -448,6 +449,9 @@ const DIST_HPD_TREND = [];
 const DIST_DATA_QUALITY = {
   confirmed: [   // units that skip the age check (runbook rule 4)
     { asset: '386045', loc: '359', confirmed: '2026-10-09', by: 'Chet', note: 'Used unit delivered June 2026; first DVIR reading 1,741.7 is prior-owner hours.' }
+  ],
+  departed: [    // units that left the fleet after the roster date; removed from DIST_ASSET_DETAIL
+    {"asset": "377071", "loc": "356", "type": "11K Yard Forklift", "ownership": "Operating Lease", "date_in": "2018-01-01", "left": "2026-10-12", "last_reading": 6313.1, "last_reading_date": "2026-09-23", "monthly_lease": 398.0, "pm_window_spend": 1394.86, "note": "Left the fleet effective 10/12/2026 (Chet). Last DVIR inspection 9/23/2026."}
   ],
   chronic:  [],   // { asset, loc, rejected_days, reporting_days, note }
   unknown:  [],   // { asset_number, vehicle_name, dvir_location, last_seen, note }
@@ -1095,6 +1099,10 @@ function renderQuality() {
     DIST_DATA_QUALITY.chronic || [], 'None.');
   simpleTable('unknownTable', [{ h: 'Asset No.', f: r => esc(r.asset_number) }, { h: 'DVIR Name', k: 'vehicle_name', left: 1 }, { h: 'DVIR Location', k: 'dvir_location' }, { h: 'Last Seen', f: r => fShort(r.last_seen) }, { h: 'Note', k: 'note', left: 1 }],
     DIST_DATA_QUALITY.unknown || [], 'None.');
+  simpleTable('departedTable', [{ h: 'Asset', f: r => `<strong>${esc(r.asset)}</strong>` }, { h: 'DC', k: 'loc' }, { h: 'Type', k: 'type', left: 1 }, { h: 'Ownership', k: 'ownership' },
+    { h: 'Left', f: r => fShort(r.left) }, { h: 'Last Reading', f: r => `${fNum(r.last_reading, 1)} on ${fShort(r.last_reading_date)}` },
+    { h: 'Annual Lease Ended', f: r => r.monthly_lease ? fMoney(r.monthly_lease * DIST_META.cost_basis.months_per_year) : dash }, { h: 'Note', k: 'note', left: 1 }],
+    DIST_DATA_QUALITY.departed || [], 'None.');
   simpleTable('excludedTable', [{ h: 'Asset', f: r => `<strong>${esc(r.asset)}</strong>` }, { h: 'DVIR Location', k: 'dvir_location' }, { h: 'Reason', k: 'reason', left: 1 }],
     DIST_DATA_QUALITY.excluded || [], 'None.');
 }
