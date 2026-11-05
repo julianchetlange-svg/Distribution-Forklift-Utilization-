@@ -35,7 +35,7 @@
   .nav-btn.active { color:var(--green); border-bottom-color:var(--green); }
   button:focus-visible, select:focus-visible, input:focus-visible, th:focus-visible, .dc-hdr:focus-visible { outline:2px solid var(--green); outline-offset:2px; }
 
-  .main { padding:20px 28px 40px; max-width:1400px; margin:0 auto; }
+  .main { padding:20px 24px 40px; max-width:1880px; margin:0 auto; }
   .panel { display:none; }
   .panel.active { display:block; }
 
@@ -74,21 +74,24 @@
   .section-hdr:first-child { margin-top:4px; }
   .section-hdr h2 { font-size:15px; font-weight:700; color:var(--green); display:flex; align-items:center; gap:8px; }
   .section-hdr h2::before { content:''; width:4px; height:18px; background:var(--yellow); border-radius:2px; display:inline-block; }
-  .card { background:var(--white); border-radius:var(--radius-lg); border:1px solid var(--gray-2); box-shadow:var(--shadow); padding:18px 20px; margin-bottom:16px; }
+  .card { background:var(--white); border-radius:var(--radius-lg); border:1px solid var(--gray-2); box-shadow:var(--shadow); padding:14px 14px; margin-bottom:16px; }
   .card-title { font-size:13px; font-weight:700; color:var(--green); margin-bottom:14px; padding-bottom:10px; border-bottom:1px solid var(--gray-1); }
   .two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
 
   /* Tables */
   .tbl-wrap { overflow-x:auto; }
   table { width:100%; border-collapse:collapse; font-size:12px; }
-  th { background:var(--green); color:var(--white); padding:8px 10px; text-align:center; font-size:11px; font-weight:600; letter-spacing:.04em; white-space:nowrap; position:sticky; top:0; z-index:2; }
+  #unitTable, .dc-assets table { font-size:11.5px; }
+  #unitTable td, .dc-assets td { padding:6px 4px; }
+  #unitTable th, .dc-assets th { padding:7px 4px; }
+  th { background:var(--green); color:var(--white); padding:7px 6px; text-align:center; font-size:11px; font-weight:600; letter-spacing:.02em; white-space:normal; line-height:1.25; vertical-align:bottom; position:sticky; top:0; z-index:2; }
   th:first-child { border-radius:6px 0 0 0; }
   th:last-child { border-radius:0 6px 0 0; }
   th.sort { cursor:pointer; user-select:none; }
   th.sort[aria-sort="ascending"]::after { content:" ▲"; font-size:9px; }
   th.sort[aria-sort="descending"]::after { content:" ▼"; font-size:9px; }
-  td { padding:7px 10px; border-bottom:1px solid var(--gray-1); white-space:nowrap; text-align:center; font-variant-numeric:tabular-nums; }
-  td.left { text-align:left; }
+  td { padding:6px 6px; border-bottom:1px solid var(--gray-1); white-space:nowrap; text-align:center; font-variant-numeric:tabular-nums; }
+  td.left { text-align:left; white-space:normal; }
   td .wrap { white-space:normal; min-width:320px; max-width:520px; line-height:1.4; }
   tr:hover td { background:var(--green-pale); }
   tr:last-child td { border-bottom:none; }
@@ -108,10 +111,11 @@
   .badge-yellow { background:#FFF7DB; color:#856404; border:1px solid #FFC107; }
   .badge-blue { background:var(--blue-light); color:var(--blue); border:1px solid #378ADD; }
   .badge-gray { background:var(--gray-1); color:var(--gray-4); }
+  .badge-special { background:var(--green); color:var(--yellow); white-space:nowrap; }
 
   /* HPD bar */
   .hpd-bar { display:flex; align-items:center; gap:6px; justify-content:center; }
-  .hpd-bg { width:56px; height:6px; background:var(--gray-2); border-radius:3px; overflow:hidden; }
+  .hpd-bg { width:36px; height:6px; background:var(--gray-2); border-radius:3px; overflow:hidden; }
   .hpd-fill { height:100%; border-radius:3px; }
 
   /* Filters */
@@ -144,7 +148,7 @@
   .dc-name { font-size:14px; font-weight:700; color:var(--green); }
   .dc-name.below { color:var(--red); }
   .dc-sub { font-size:11px; color:var(--gray-3); margin-top:2px; }
-  .dc-assets { display:none; border-top:1px solid var(--gray-2); background:var(--gray-1); padding:12px; }
+  .dc-assets { display:none; border-top:1px solid var(--gray-2); background:var(--gray-1); padding:8px; }
   .dc-block.open .dc-assets { display:block; }
   .dc-assets th:first-child, .dc-assets th:last-child { border-radius:0; }
 
@@ -188,11 +192,13 @@
 
   /* Tooltips */
   [data-tip] { position:relative; cursor:help; }
-  [data-tip]::after { content:attr(data-tip); position:absolute; top:100%; left:50%; transform:translateX(-50%) translateY(6px); background:var(--green); color:#fff; padding:8px 11px; border-radius:6px; font-size:11px; font-weight:400; line-height:1.4; letter-spacing:0; text-transform:none; white-space:normal; width:max-content; max-width:260px; box-shadow:0 4px 14px rgba(0,0,0,.22); border-left:3px solid var(--yellow); opacity:0; visibility:hidden; transition:opacity .12s; z-index:9999; pointer-events:none; text-align:left; }
-  [data-tip]:hover::after { opacity:1; visibility:visible; }
+  [data-tip]::after { content:attr(data-tip); position:absolute; top:100%; left:50%; transform:translateX(-50%) translateY(6px); background:var(--green); color:#fff; padding:8px 11px; border-radius:6px; font-size:11px; font-weight:400; line-height:1.4; letter-spacing:0; text-transform:none; white-space:normal; width:max-content; max-width:260px; box-shadow:0 4px 14px rgba(0,0,0,.22); border-left:3px solid var(--yellow); display:none; z-index:9999; pointer-events:none; text-align:left; }
+  [data-tip]:hover::after { display:block; }
+  th:last-child[data-tip]::after, th:nth-last-child(2)[data-tip]::after { left:auto; right:0; transform:translateY(6px); }
 
   footer { margin-top:24px; font-size:11.5px; color:var(--gray-3); line-height:1.5; }
 
+  @media (max-width:1320px) { .main { padding-left:12px; padding-right:12px; } .card { padding:10px; } }
   @media (max-width:900px) {
     .two-col { grid-template-columns:1fr; }
     .dc-cells { grid-template-columns:1fr 1fr 1fr; }
@@ -346,9 +352,17 @@ const DIST_META = {
   last_file_processed: 'mccoys_distribution_october_2026_data.xlsx (DVIR 8/24–10/31 with daily readings; 2026 invoices through 10/31)',      // e.g. 'DVIR-REPORT-MASTER-2026-10-08.xlsx'
   roster_file: 'Current_Assets_10_5_2026.xlsx (Caleb Assets EOM)',
   operating_days_per_year: 307,
+  // Types that differ from the roster: units set up in Fexa before their correct type existed. Applied on every refresh.
+  type_overrides: { '381070': '4K Yard Forklift',     // Toyota 8FGCU20, entered as 6K before the 4K type existed
+                    '382020': '4K Yard Forklift' },   // Toyota 8FGCSU20, entered as 6K before the 4K type existed
   recommendation: { candidates: 'flagged units, lowest HPD first', min_months_in_service: 12, keep_capacity_coverage: true,
     tie_break: 'same in-service date: highest total hours × maintenance cost per hour',
     // Minimum number of units of a capacity class each evaluation location keeps; these units are never removed below it.
+    // Capacity classes that are never removed, whatever their usage.
+    // Special-use forklifts: tagged on every page and never removed, whatever their usage.
+    special_use_classes: { 4: 'Insulation' },                 // every 4K unloads insulation (Chet, 11/5/2026)
+    special_use_units: { '386045': 'Shipping container' },  // unloads shipping containers (Chet, 11/5/2026)
+    exclude_special_from_averages: false,
     min_units_per_class: [ { cap: 6, min: 1, reason: 'Keep at least one 6K at each location (Chet, 10/9/2026)' } ],
     // Keep a low-hour unit of the preferred make over a unit of the other make in the same removal pool.
     brand_preference: { keep: 'Toyota', over: 'Heli', max_hours: 900 },
@@ -358,7 +372,7 @@ const DIST_META = {
   cost_basis: { label: 'Annual P&L cost', parts: 'depreciation for owned units, lease payments for operating leases', depreciation_source: "BA - McCoy's Asset Depreciation Forecast Fleet Detail.xlsx", lease_source: 'Monthly lease amounts provided by Chet, 10/9/2026', months_per_year: 12 },
   days_per_month: 30.44,
   flag_threshold_pct: 60,
-  stale_after_days: 7,
+  stale_after_days: 7,          // older readings are carried forward and listed in Data Quality (no separate status)
   min_age_months: 3,
   min_accepted_readings: 5,
   benchmark: { type: 'distribution_average', label: 'Distribution average' },
@@ -390,7 +404,7 @@ const DIST_META = {
      keep_reason,           // optional: unit is kept by decision and never recommended for removal
      removal_override,      // optional: approved for removal even though it fails the capacity-coverage rule
      depreciation_asset_id, depreciation_note,
-     dvir_status }          // 'Validated' | 'Stale' | 'Held for review' | 'No readings'      */
+     dvir_status }          // 'Validated' | 'Held for review' | 'No readings'      */
 const DIST_ASSET_DETAIL = [
   {"loc": "353", "asset": "382008", "type": "6K Yard Forklift", "class": "Forklift", "mfr": "Toyota", "ownership": "Company Owned", "date_in": "2022-06-20", "reading_hours": 4685.8, "reading_date": "2026-10-31", "accepted_readings": 56, "reading_note": null, "latest_reported_hours": 4685.8, "latest_reported_date": "2026-10-31", "lifetime_spend": 31965.7, "dvir_status": "Validated", "known_spend": 31965.7, "spend_invoices": 36, "spend_note": null, "hold_note": null, "monthly_depreciation": 403.65, "depreciation_asset_id": "BA-048140", "depreciation_note": null, "monthly_lease": null, "pm_window_spend": 920.05, "pm_window_invoices": 4, "lifetime_pm_spend": 3318.87},
   {"loc": "353", "asset": "382009", "type": "6K Yard Forklift", "class": "Forklift", "mfr": "Toyota", "ownership": "Company Owned", "date_in": "2022-07-29", "reading_hours": 4603.6, "reading_date": "2026-10-31", "accepted_readings": 58, "reading_note": null, "latest_reported_hours": 4603.6, "latest_reported_date": "2026-10-31", "lifetime_spend": 21808.92, "dvir_status": "Validated", "known_spend": 21808.92, "spend_invoices": 33, "spend_note": null, "hold_note": null, "monthly_depreciation": 403.65, "depreciation_asset_id": "BA-048138", "depreciation_note": null, "monthly_lease": null, "pm_window_spend": 876.5, "pm_window_invoices": 4, "lifetime_pm_spend": 2815.24},
@@ -419,7 +433,7 @@ const DIST_ASSET_DETAIL = [
   {"loc": "359", "asset": "381092", "type": "8K Yard Forklift", "class": "Forklift", "mfr": "Toyota", "ownership": "Company Owned", "date_in": "2021-12-15", "reading_hours": 8129.2, "reading_date": "2026-10-30", "accepted_readings": 55, "reading_note": null, "latest_reported_hours": 8129.2, "latest_reported_date": "2026-10-30", "lifetime_spend": 40694.4, "dvir_status": "Validated", "known_spend": 40694.4, "spend_invoices": 48, "spend_note": null, "hold_note": null, "monthly_depreciation": 719.86, "depreciation_asset_id": "BA-047354", "depreciation_note": null, "monthly_lease": null, "pm_window_spend": 1261.2, "pm_window_invoices": 4, "lifetime_pm_spend": 3193.6},
   {"loc": "359", "asset": "381093", "type": "8K Yard Forklift", "class": "Forklift", "mfr": "Toyota", "ownership": "Company Owned", "date_in": "2021-12-16", "reading_hours": 6381.5, "reading_date": "2026-10-31", "accepted_readings": 55, "reading_note": null, "latest_reported_hours": 6381.5, "latest_reported_date": "2026-10-31", "lifetime_spend": 26878.57, "dvir_status": "Validated", "known_spend": 26878.57, "spend_invoices": 50, "spend_note": null, "hold_note": null, "monthly_depreciation": 719.86, "depreciation_asset_id": "BA-047355", "depreciation_note": null, "monthly_lease": null, "pm_window_spend": 1188.96, "pm_window_invoices": 4, "lifetime_pm_spend": 3052.18},
   {"loc": "359", "asset": "382001", "type": "15.5K Yard Forklift", "class": "Forklift", "mfr": "Heli", "ownership": "Company Owned", "date_in": "2022-12-30", "reading_hours": 2003.4, "reading_date": "2026-10-30", "accepted_readings": 30, "reading_note": null, "latest_reported_hours": 2003.4, "latest_reported_date": "2026-10-30", "lifetime_spend": 60517.11, "dvir_status": "Validated", "known_spend": 60517.11, "spend_invoices": 58, "spend_note": null, "hold_note": null, "monthly_depreciation": 981.91, "depreciation_asset_id": "BA-048796", "depreciation_note": null, "monthly_lease": null, "pm_window_spend": 1935.28, "pm_window_invoices": 6, "lifetime_pm_spend": 4151.01},
-  {"loc": "359", "asset": "382004", "type": "17.5K Yard Forklift", "class": "Forklift", "mfr": "Heli", "ownership": "Company Owned", "date_in": "2023-02-10", "reading_hours": 604.0, "reading_date": "2026-10-13", "accepted_readings": 36, "reading_note": "26.3 hrs below the April dashboard's 2/6/2026 reading of 630.3", "latest_reported_hours": 604.0, "latest_reported_date": "2026-10-13", "lifetime_spend": 30075.5, "dvir_status": "Stale", "known_spend": 30075.5, "spend_invoices": 28, "spend_note": null, "hold_note": null, "monthly_depreciation": 981.91, "depreciation_asset_id": "BA-049049", "depreciation_note": null, "monthly_lease": null, "pm_window_spend": 2665.82, "pm_window_invoices": 7, "removal_override": "Approved for removal although it is the only 17.5K at 359: runs 0.54 HPD (Chet, 10/9/2026).", "lifetime_pm_spend": 3951.9},
+  {"loc": "359", "asset": "382004", "type": "17.5K Yard Forklift", "class": "Forklift", "mfr": "Heli", "ownership": "Company Owned", "date_in": "2023-02-10", "reading_hours": 604.0, "reading_date": "2026-10-13", "accepted_readings": 36, "reading_note": "26.3 hrs below the April dashboard's 2/6/2026 reading of 630.3", "latest_reported_hours": 604.0, "latest_reported_date": "2026-10-13", "lifetime_spend": 30075.5, "dvir_status": "Validated", "known_spend": 30075.5, "spend_invoices": 28, "spend_note": null, "hold_note": null, "monthly_depreciation": 981.91, "depreciation_asset_id": "BA-049049", "depreciation_note": null, "monthly_lease": null, "pm_window_spend": 2665.82, "pm_window_invoices": 7, "removal_override": "Approved for removal although it is the only 17.5K at 359: runs 0.54 HPD (Chet, 10/9/2026).", "lifetime_pm_spend": 3951.9},
   {"loc": "359", "asset": "384008", "type": "8K Yard Forklift", "class": "Forklift", "mfr": "Toyota", "ownership": "Company Owned", "date_in": "2024-01-30", "reading_hours": 4742.3, "reading_date": "2026-10-31", "accepted_readings": 51, "reading_note": null, "latest_reported_hours": 4742.3, "latest_reported_date": "2026-10-31", "lifetime_spend": 29742.39, "dvir_status": "Validated", "known_spend": 29742.39, "spend_invoices": 34, "spend_note": null, "hold_note": null, "monthly_depreciation": 702.18, "depreciation_asset_id": "BA-050198", "depreciation_note": null, "monthly_lease": null, "pm_window_spend": 1246.72, "pm_window_invoices": 4, "lifetime_pm_spend": 2036.26},
   {"loc": "359", "asset": "384009", "type": "8K Yard Forklift", "class": "Forklift", "mfr": "Toyota", "ownership": "Company Owned", "date_in": "2024-01-25", "reading_hours": 4253.2, "reading_date": "2026-10-30", "accepted_readings": 53, "reading_note": null, "latest_reported_hours": 4253.2, "latest_reported_date": "2026-10-30", "lifetime_spend": 35267.09, "dvir_status": "Validated", "known_spend": 35267.09, "spend_invoices": 46, "spend_note": null, "hold_note": null, "monthly_depreciation": 717.65, "depreciation_asset_id": "BA-050194", "depreciation_note": null, "monthly_lease": null, "pm_window_spend": 1063.86, "pm_window_invoices": 4, "lifetime_pm_spend": 1910.19},
   {"loc": "359", "asset": "384010", "type": "8K Yard Forklift", "class": "Forklift", "mfr": "Toyota", "ownership": "Company Owned", "date_in": "2024-01-25", "reading_hours": 3661.4, "reading_date": "2026-10-31", "accepted_readings": 43, "reading_note": "DVIR reading accepted. The April dashboard's 3/9/2026 reading of 5,041.4 is treated as the outlier (a meter swap can't explain the drop); Fleet to confirm.", "latest_reported_hours": 3661.4, "latest_reported_date": "2026-10-31", "lifetime_spend": 28010.42, "dvir_status": "Validated", "known_spend": 28010.42, "spend_invoices": 31, "spend_note": null, "hold_note": null, "monthly_depreciation": 717.65, "depreciation_asset_id": "BA-050195", "depreciation_note": null, "monthly_lease": null, "pm_window_spend": 966.33, "pm_window_invoices": 4, "lifetime_pm_spend": 1765.96},
@@ -430,11 +444,11 @@ const DIST_ASSET_DETAIL = [
   {"loc": "359", "asset": "384069", "type": "8K Yard Forklift", "class": "Forklift", "mfr": "Toyota", "ownership": "Company Owned", "date_in": "2024-04-29", "reading_hours": 4943.6, "reading_date": "2026-10-30", "accepted_readings": 53, "reading_note": null, "latest_reported_hours": 4943.6, "latest_reported_date": "2026-10-30", "lifetime_spend": 50371.8, "dvir_status": "Validated", "known_spend": 50371.8, "spend_invoices": 48, "spend_note": null, "hold_note": null, "monthly_depreciation": 717.65, "depreciation_asset_id": "BA-050582", "depreciation_note": null, "monthly_lease": null, "pm_window_spend": 1146.47, "pm_window_invoices": 4, "lifetime_pm_spend": 1636.26},
   {"loc": "359", "asset": "384078", "type": "8K Yard Forklift", "class": "Forklift", "mfr": "Toyota", "ownership": "Company Owned", "date_in": "2024-12-26", "reading_hours": 2391.7, "reading_date": "2026-10-31", "accepted_readings": 52, "reading_note": null, "latest_reported_hours": 2391.7, "latest_reported_date": "2026-10-31", "lifetime_spend": 5800.33, "dvir_status": "Validated", "known_spend": 5800.33, "spend_invoices": 11, "spend_note": null, "hold_note": null, "monthly_depreciation": 727.96, "depreciation_asset_id": "BA-051636", "depreciation_note": null, "monthly_lease": null, "pm_window_spend": 842.22, "pm_window_invoices": 3, "lifetime_pm_spend": 842.22},
   {"loc": "359", "asset": "386041", "type": "8K Yard Forklift", "class": "Forklift", "mfr": "Toyota", "ownership": "Company Owned", "date_in": "2026-03-31", "reading_hours": 1398.8, "reading_date": "2026-10-30", "accepted_readings": 45, "reading_note": null, "latest_reported_hours": 1398.8, "latest_reported_date": "2026-10-30", "lifetime_spend": 1836.79, "dvir_status": "Validated", "known_spend": 1836.79, "spend_invoices": 5, "spend_note": null, "hold_note": null, "monthly_depreciation": 779.77, "depreciation_asset_id": "BA-052436", "depreciation_note": null, "monthly_lease": null, "pm_window_spend": 299.05, "pm_window_invoices": 1, "lifetime_pm_spend": 299.05},
-  {"loc": "359", "asset": "386043", "type": "10K Yard Forklift", "class": "Forklift", "mfr": "Toyota", "ownership": "Company Owned", "date_in": "2026-05-06", "reading_hours": 996.5, "reading_date": "2026-10-19", "accepted_readings": 36, "reading_note": null, "latest_reported_hours": 996.5, "latest_reported_date": "2026-10-19", "lifetime_spend": 1721.37, "dvir_status": "Stale", "known_spend": 1721.37, "spend_invoices": 4, "spend_note": null, "hold_note": null, "monthly_depreciation": 870.52, "depreciation_asset_id": "BA-052483", "depreciation_note": null, "monthly_lease": null, "pm_window_spend": 232.14, "pm_window_invoices": 1, "lifetime_pm_spend": 232.14},
+  {"loc": "359", "asset": "386043", "type": "10K Yard Forklift", "class": "Forklift", "mfr": "Toyota", "ownership": "Company Owned", "date_in": "2026-05-06", "reading_hours": 996.5, "reading_date": "2026-10-19", "accepted_readings": 36, "reading_note": null, "latest_reported_hours": 996.5, "latest_reported_date": "2026-10-19", "lifetime_spend": 1721.37, "dvir_status": "Validated", "known_spend": 1721.37, "spend_invoices": 4, "spend_note": null, "hold_note": null, "monthly_depreciation": 870.52, "depreciation_asset_id": "BA-052483", "depreciation_note": null, "monthly_lease": null, "pm_window_spend": 232.14, "pm_window_invoices": 1, "lifetime_pm_spend": 232.14},
   {"loc": "359", "asset": "386044", "type": "10K Yard Forklift", "class": "Forklift", "mfr": "Toyota", "ownership": "Company Owned", "date_in": "2026-05-06", "reading_hours": 953.2, "reading_date": "2026-10-30", "accepted_readings": 38, "reading_note": null, "latest_reported_hours": 953.2, "latest_reported_date": "2026-10-30", "lifetime_spend": 865.81, "dvir_status": "Validated", "known_spend": 865.81, "spend_invoices": 2, "spend_note": null, "hold_note": null, "monthly_depreciation": 870.52, "depreciation_asset_id": "BA-052484", "depreciation_note": null, "monthly_lease": null, "pm_window_spend": 301.47, "pm_window_invoices": 1, "lifetime_pm_spend": 301.47},
-  {"loc": "359", "asset": "386045", "type": "13K Yard Forklift", "class": "Forklift", "mfr": "Toyota", "ownership": "Company Owned", "date_in": "2026-06-29", "reading_hours": null, "reading_date": null, "accepted_readings": 0, "reading_note": null, "latest_reported_hours": 1743.4, "latest_reported_date": "2026-10-30", "lifetime_spend": 979.55, "dvir_status": "Held for review", "known_spend": 979.55, "spend_invoices": 2, "spend_note": null, "hold_note": "Confirmed used unit, delivered June 2026. Its meter barely moves: 1,734.4 on 8/24 to 1,743.4 on 10/30, under 10 hours in about two months. Release once the starting meter (1,734.4) is confirmed; at that pace it would show about 0.1 HPD and be flagged.", "monthly_depreciation": 492.04, "depreciation_asset_id": "BA-052714", "depreciation_note": "Used unit: lower monthly depreciation confirmed correct (Chet, 10/9/2026).", "baseline_meter_hours": 1741.7, "monthly_lease": null, "pm_window_spend": 284.58, "pm_window_invoices": 1, "lifetime_pm_spend": 284.58},
-  {"loc": "489", "asset": "377068", "type": "13K Yard Forklift", "class": "Forklift", "mfr": "Toyota", "ownership": "Operating Lease", "date_in": "2018-01-01", "reading_hours": 5737.3, "reading_date": "2024-04-23", "accepted_readings": 37, "reading_note": "Counted up from the 4/23/2024 reading (April dashboard) at the unit's own lifetime rate to the hours as-of date. The current DVIR meter (1,732.3 on 9/30/2026) appears to be a replacement, so it is not used for lifetime hours.", "latest_reported_hours": 1835.7, "latest_reported_date": "2026-10-30", "lifetime_spend": 164319.13, "dvir_status": "Stale", "known_spend": 136856.18, "spend_invoices": 125, "spend_note": "Pro-rated \u00d71.201: in service 01/01/2018, spend data starts 6/24/2019", "hold_note": null, "monthly_depreciation": 0.0, "depreciation_asset_id": null, "depreciation_note": null, "status_note": "Lifetime hours counted up from the 4/23/2024 reading of 5,737.3 (meter assumed replaced; current DVIR meter reads 1,835.7 on 10/30/2026). Replace with the old meter's final reading if Fleet or the lessor has it.", "monthly_lease": 466.06, "pm_window_spend": 2025.96, "pm_window_invoices": 7, "lifetime_pm_spend": 7708.3},
-  {"loc": "489", "asset": "377069", "type": "13K Yard Forklift", "class": "Forklift", "mfr": "Toyota", "ownership": "Operating Lease", "date_in": "2018-01-01", "reading_hours": 1017.1, "reading_date": "2026-09-24", "accepted_readings": 25, "reading_note": "Meter assumed replaced: lifetime hours = old meter 8,288.3 (last read 3/10/2023, April dashboard) + current meter 1,017.1. Old-meter hours after 3/10/2023 are not captured, so this is a minimum.", "latest_reported_hours": 1017.1, "latest_reported_date": "2026-09-24", "lifetime_spend": 209144.98, "dvir_status": "Stale", "known_spend": 174190.21, "spend_invoices": 122, "spend_note": "Pro-rated \u00d71.201: in service 01/01/2018, spend data starts 6/24/2019", "hold_note": null, "monthly_depreciation": 0.0, "depreciation_asset_id": null, "depreciation_note": null, "prior_meter_hours": 8288.3, "monthly_lease": 466.06, "pm_window_spend": 2036.32, "pm_window_invoices": 7, "lifetime_pm_spend": 7464.55},
+  {"loc": "359", "asset": "386045", "type": "13K Yard Forklift", "class": "Forklift", "mfr": "Toyota", "ownership": "Company Owned", "date_in": "2026-06-29", "reading_hours": 1742.0, "reading_date": "2026-10-22", "accepted_readings": 46, "reading_note": "Former rental, bought used and delivered 6/29/2026 with about 1,727 hours on the meter. Meter 1,742.0 on 10/22/2026 from a maintenance invoice; pace since the first DVIR reading (1,734.4 on 8/24) is about 0.13 hrs a day. Only hours since delivery count, carried forward from 10/22 to 10/31.", "latest_reported_hours": 1743.4, "latest_reported_date": "2026-10-30", "lifetime_spend": 979.55, "dvir_status": "Validated", "known_spend": 979.55, "spend_invoices": 2, "spend_note": null, "hold_note": null, "monthly_depreciation": 492.04, "depreciation_asset_id": "BA-052714", "depreciation_note": "Bought used (former rental): lower monthly depreciation is correct.", "baseline_meter_hours": 1727.2, "monthly_lease": null, "pm_window_spend": 284.58, "pm_window_invoices": 1, "lifetime_pm_spend": 284.58},
+  {"loc": "489", "asset": "377068", "type": "13K Yard Forklift", "class": "Forklift", "mfr": "Toyota", "ownership": "Operating Lease", "date_in": "2018-01-01", "reading_hours": 5737.3, "reading_date": "2024-04-23", "accepted_readings": 37, "reading_note": "Counted up from the 4/23/2024 reading (April dashboard) at the unit's own lifetime rate to the hours as-of date. The current DVIR meter (1,732.3 on 9/30/2026) appears to be a replacement, so it is not used for lifetime hours.", "latest_reported_hours": 1835.7, "latest_reported_date": "2026-10-30", "lifetime_spend": 164319.13, "dvir_status": "Validated", "known_spend": 136856.18, "spend_invoices": 125, "spend_note": "Pro-rated \u00d71.201: in service 01/01/2018, spend data starts 6/24/2019", "hold_note": null, "monthly_depreciation": 0.0, "depreciation_asset_id": null, "depreciation_note": null, "status_note": "Lifetime hours counted up from the 4/23/2024 reading of 5,737.3 (meter assumed replaced; current DVIR meter reads 1,835.7 on 10/30/2026). Replace with the old meter's final reading if Fleet or the lessor has it.", "monthly_lease": 466.06, "pm_window_spend": 2025.96, "pm_window_invoices": 7, "lifetime_pm_spend": 7708.3},
+  {"loc": "489", "asset": "377069", "type": "13K Yard Forklift", "class": "Forklift", "mfr": "Toyota", "ownership": "Operating Lease", "date_in": "2018-01-01", "reading_hours": 1017.1, "reading_date": "2026-09-24", "accepted_readings": 25, "reading_note": "Meter assumed replaced: lifetime hours = old meter 8,288.3 (last read 3/10/2023, April dashboard) + current meter 1,017.1. Old-meter hours after 3/10/2023 are not captured, so this is a minimum.", "latest_reported_hours": 1017.1, "latest_reported_date": "2026-09-24", "lifetime_spend": 209144.98, "dvir_status": "Validated", "known_spend": 174190.21, "spend_invoices": 122, "spend_note": "Pro-rated \u00d71.201: in service 01/01/2018, spend data starts 6/24/2019", "hold_note": null, "monthly_depreciation": 0.0, "depreciation_asset_id": null, "depreciation_note": null, "prior_meter_hours": 8288.3, "monthly_lease": 466.06, "pm_window_spend": 2036.32, "pm_window_invoices": 7, "lifetime_pm_spend": 7464.55},
   {"loc": "489", "asset": "377073", "type": "13K Yard Forklift", "class": "Forklift", "mfr": "Toyota", "ownership": "Operating Lease", "date_in": "2018-01-01", "reading_hours": 1945.7, "reading_date": "2026-10-31", "accepted_readings": 51, "reading_note": "Meter assumed replaced: lifetime hours = old meter 8,131.0 (April dashboard, read date unknown) + current meter 1,911.4. Old-meter hours after that reading are not captured, so this is a minimum.", "latest_reported_hours": 1945.7, "latest_reported_date": "2026-10-31", "lifetime_spend": 270548.07, "dvir_status": "Validated", "known_spend": 225330.89, "spend_invoices": 148, "spend_note": "Pro-rated \u00d71.201: in service 01/01/2018, spend data starts 6/24/2019", "hold_note": null, "monthly_depreciation": 0.0, "depreciation_asset_id": null, "depreciation_note": null, "prior_meter_hours": 8131.0, "monthly_lease": 466.06, "pm_window_spend": 2159.39, "pm_window_invoices": 8, "lifetime_pm_spend": 7773.22},
   {"loc": "489", "asset": "384105", "type": "13K Yard Forklift", "class": "Forklift", "mfr": "Toyota", "ownership": "Company Owned", "date_in": "2024-07-23", "reading_hours": 1481.2, "reading_date": "2026-10-31", "accepted_readings": 50, "reading_note": null, "latest_reported_hours": 1481.2, "latest_reported_date": "2026-10-31", "lifetime_spend": 5761.5, "dvir_status": "Validated", "known_spend": 5761.5, "spend_invoices": 13, "spend_note": null, "hold_note": null, "monthly_depreciation": 1161.64, "depreciation_asset_id": "BA-051035", "depreciation_note": null, "monthly_lease": null, "pm_window_spend": 1176.62, "pm_window_invoices": 4, "lifetime_pm_spend": 1764.41},
   {"loc": "489", "asset": "385001", "type": "15.5K Yard Forklift", "class": "Forklift", "mfr": "Toyota", "ownership": "Company Owned", "date_in": "2025-06-06", "reading_hours": 973.3, "reading_date": "2026-10-31", "accepted_readings": 51, "reading_note": null, "latest_reported_hours": 973.3, "latest_reported_date": "2026-10-31", "lifetime_spend": 4752.3, "dvir_status": "Validated", "known_spend": 4752.3, "spend_invoices": 12, "spend_note": null, "hold_note": null, "monthly_depreciation": 1309.92, "depreciation_asset_id": "BA-051977", "depreciation_note": null, "monthly_lease": null, "pm_window_spend": 1414.91, "pm_window_invoices": 5, "lifetime_pm_spend": 1414.91},
@@ -450,7 +464,7 @@ const DIST_HPD_TREND = [];
 
 const DIST_DATA_QUALITY = {
   confirmed: [   // units that skip the age check (runbook rule 4)
-    { asset: '386045', loc: '359', confirmed: '2026-10-09', by: 'Chet', note: 'Used unit delivered June 2026; first DVIR reading 1,741.7 is prior-owner hours.' }
+    { asset: '386045', loc: '359', confirmed: '2026-10-09', by: 'Chet', note: 'Former rental, bought used; delivered 6/29/2026 with about 1,727 hours on the meter. Usage is measured from that point.' }
   ],
   departed: [    // units that left the fleet after the roster date; removed from DIST_ASSET_DETAIL
     {"asset": "377071", "loc": "356", "type": "11K Yard Forklift", "ownership": "Operating Lease", "date_in": "2018-01-01", "left": "2026-10-12", "last_reading": 6313.1, "last_reading_date": "2026-09-23", "monthly_lease": 398.0, "pm_window_spend": 1394.86, "note": "Left the fleet effective 10/12/2026 (Chet). Last DVIR inspection 9/23/2026."}
@@ -467,7 +481,7 @@ const DIST_DATA_QUALITY = {
    COMPUTE LAYER — turns the constants into everything the panels show.
    ===================================================================== */
 
-const STATUSES = ['Validated', 'Stale', 'Held for review', 'No readings'];
+const STATUSES = ['Validated', 'Held for review', 'No readings'];
 const MS_PER_DAY = 864e5;
 
 function parseDate(s) {
@@ -486,7 +500,8 @@ function compute(meta, detail) {
   const MD = meta.days_per_month;
   const scope = new Set(meta.locations.map(l => l.id));
 
-  const units = detail.filter(u => scope.has(String(u.loc))).map(u => {
+  const units = detail.filter(u => scope.has(String(u.loc))).map(u0 => {
+    const u = (meta.type_overrides || {})[String(u0.asset)] ? { ...u0, type: meta.type_overrides[String(u0.asset)] } : u0;
     const dateIn = parseDate(u.date_in);
     const rDate = parseDate(u.reading_date);
     const H = u.reading_hours != null ? u.reading_hours + (u.prior_meter_hours || 0) - (u.baseline_meter_hours || 0) : null;
@@ -505,11 +520,13 @@ function compute(meta, detail) {
     let derived;
     if (held) derived = 'Held for review';
     else if (H == null || rDate == null) derived = 'No readings';
-    else derived = daysSince < meta.stale_after_days ? 'Validated' : 'Stale';
+    else derived = 'Validated';
 
     const shortHistory = ageMonths == null || ageMonths < meta.min_age_months
       || (u.accepted_readings ?? 0) < meta.min_accepted_readings;
-    const eligible = hpd != null && !shortHistory;
+    const rcfg = meta.recommendation || {};
+    const specialUse = (rcfg.special_use_units || {})[String(u.asset)] || (rcfg.special_use_classes || {})[String(parseFloat(u.type))] || null;
+    const eligible = hpd != null && !shortHistory && !(specialUse && rcfg.exclude_special_from_averages);
 
     const monthly_cost = (u.monthly_depreciation != null || u.monthly_lease != null) ? (u.monthly_depreciation || 0) + (u.monthly_lease || 0) : null;
     const annual_rate = monthly_cost != null ? monthly_cost * meta.cost_basis.months_per_year : null;
@@ -517,7 +534,7 @@ function compute(meta, detail) {
     const pmFrom = dateIn != null ? Math.max(pmStart, dateIn) : pmStart;
     const pmMonths = (pmEnd - pmFrom) / MS_PER_DAY / MD + 1 / MD;
     const pm_annual = (u.pm_window_spend != null && pmMonths > 0) ? u.pm_window_spend * 12 / pmMonths : null;
-    return { ...u, monthly_cost, annual_rate, pmMonths, pm_annual, loc: String(u.loc), asset: String(u.asset), ageMonths, daysSince, proj, hpd,
+    return { ...u, specialUse, monthly_cost, annual_rate, pmMonths, pm_annual, loc: String(u.loc), asset: String(u.asset), ageMonths, daysSince, proj, hpd,
       hpd2: round(hpd, 2), cph, derivedStatus: derived, shortHistory, eligible };
   });
 
@@ -553,7 +570,7 @@ function compute(meta, detail) {
       pmSavings: lu.filter(u => u.flagged).reduce((s, u) => s + (u.pm_annual || 0), 0),
       spend: sumOrNull(lu.map(u => u.lifetime_spend)),
       flagged: lu.filter(u => u.flagged).length,
-      stale: lu.filter(u => u.derivedStatus === 'Stale').length,
+      stale: lu.filter(u => u.derivedStatus === 'Validated' && u.daysSince >= meta.stale_after_days).length,
       held: lu.filter(u => u.derivedStatus === 'Held for review').length,
       none: lu.filter(u => u.derivedStatus === 'No readings').length
     };
@@ -594,7 +611,7 @@ function compute(meta, detail) {
     const removedSet = new Set();
     l.steps = []; l.review = []; l.kept = [];
     lu.filter(u => u.flagged).sort((a, b) => a.hpd - b.hpd).forEach(f => {
-      if (f.keep_reason) { l.kept.push({ u: f, savings: savingsOf(f), reasons: [f.keep_reason] }); return; }
+      if (f.specialUse || f.keep_reason) { l.kept.push({ u: f, savings: savingsOf(f), reasons: [f.specialUse ? `Special use – ${f.specialUse}: not removed even with limited usage.` : f.keep_reason] }); return; }
       if (removedSet.has(f)) return;   // already pulled as an earlier swap
       const minRule = (rc.min_units_per_class || []).find(m => m.cap === cap(f));
       if (minRule && lu.filter(o => cap(o) === cap(f) && !removedSet.has(o)).length <= minRule.min) {
@@ -605,7 +622,7 @@ function compute(meta, detail) {
       const classes = [...new Set(lu.map(cap))].filter(c => c >= (sub ? sub.remove_class : cap(f))).sort((a, b) => a - b);
       let pick = null, basis = null;
       for (const c of classes) {
-        const pool = lu.filter(o => cap(o) === c && o.eligible && !o.keep_reason && !removedSet.has(o)
+        const pool = lu.filter(o => cap(o) === c && o.eligible && !o.keep_reason && !o.specialUse && !removedSet.has(o)
             && (!rc.removed_must_be_flagged || o === f)
             && (rc.min_units_per_class || []).every(m => m.cap !== cap(o) || lu.filter(x => x !== o && cap(x) === m.cap && !removedSet.has(x)).length >= m.min)
             && o.ageMonths >= rc.min_months_in_service
@@ -742,6 +759,9 @@ const fShort = s => { const t = parseDate(s); if (t == null) return '—'; const
 const fNum = (x, p = 0) => x == null ? '—' : x.toLocaleString('en-US', { minimumFractionDigits: p, maximumFractionDigits: p });
 const fMoney = (x, p = 0) => x == null ? '—' : (x < 0 && Math.abs(x) >= 0.5 / 10 ** p ? '−$' : '$') + fNum(Math.abs(x), p);
 const fPct = x => x == null ? '—' : (x > 0 ? '+' : x < 0 ? '−' : '') + fNum(Math.abs(x * 100), 1) + '%';
+const specialTag = u => u && u.specialUse ? ` <span class="badge badge-special">Special use – ${esc(u.specialUse)}</span>` : '';
+const shortType = s => String(s || '').replace(/ Yard Forklift$/, '');
+const shortOwn = s => ({ 'Company Owned': 'Owned', 'Operating Lease': 'Lease' })[s] || s;
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const statusPill = s => `<span class="badge ${{ 'Validated': 'badge-green', 'Stale': 'badge-yellow', 'Held for review': 'badge-blue', 'No readings': 'badge-gray' }[s] || 'badge-gray'}">${esc(s)}</span>`;
 const LOC_COLORS = ['#1F7058', '#378ADD', '#D35400', '#8E44AD', '#555550', '#1F7A8C', '#A33A5B'];
@@ -886,7 +906,7 @@ function renderOpportunity() {
 function renderRecs() {
   const m = DIST_META, rc = m.recommendation, r = C.rec;
   $('recNote').innerHTML = `<strong>How candidates are chosen:</strong> every flagged unit (HPD below ${m.flag_threshold_pct}% of the ${esc(C.benchmarkLabel.toLowerCase())}, ${fNum(C.threshold, 2)}) is considered, lowest HPD first. ` +
-    `A flagged unit shows its capacity class has more units than the work needs, so the unit <strong>removed is the oldest like unit at the DC</strong>: same capacity class, or the nearest larger class if there is no other. That can be the flagged unit itself; when it is not, the flagged unit stays and takes on the work. Units with the same in-service date are decided by total hours × maintenance cost per hour, highest first. ${(rc.min_units_per_class || []).map(m => `Each location keeps at least ${m.min} ${m.cap}K; a flagged ${m.cap}K that is the last one is kept. `).join('')}${rc.brand_preference ? `If that unit is a ${esc(rc.brand_preference.keep)} with under ${fNum(rc.brand_preference.max_hours, 0)} total hours and a ${esc(rc.brand_preference.over)} is in the same pool, the ${esc(rc.brand_preference.over)} is removed instead. ` : ''}Candidates must be in service at least ${rc.min_months_in_service} months, and another unit at the DC must still be rated for their capacity (larger units can absorb smaller units' work, not the reverse). Units kept by decision are never removed. ${(rc.combined_sites || []).map(g => `<strong>${esc(g.name)}</strong> is evaluated as one location because units can be moved on site: removal candidates, capacity coverage, projected HPD and the repair average all span both. `).join('')}Percentages after removal compare against today's averages (distribution ${fNum(C.benchmark, 2)}${C.storeAvg != null ? `, store ${fNum(C.storeAvg, 3)}` : ''}). ` +
+    `A flagged unit shows its capacity class has more units than the work needs, so the unit <strong>removed is the oldest like unit at the DC</strong>: same capacity class, or the nearest larger class if there is no other. That can be the flagged unit itself; when it is not, the flagged unit stays and takes on the work. Units with the same in-service date are decided by total hours × maintenance cost per hour, highest first. ${(rc.min_units_per_class || []).map(m => `Each location keeps at least ${m.min} ${m.cap}K; a flagged ${m.cap}K that is the last one is kept. `).join('')}${rc.brand_preference ? `If that unit is a ${esc(rc.brand_preference.keep)} with under ${fNum(rc.brand_preference.max_hours, 0)} total hours and a ${esc(rc.brand_preference.over)} is in the same pool, the ${esc(rc.brand_preference.over)} is removed instead. ` : ''}Candidates must be in service at least ${rc.min_months_in_service} months, and another unit at the DC must still be rated for their capacity (larger units can absorb smaller units' work, not the reverse). Units kept by decision and <strong>special-use</strong> forklifts (insulation, shipping container) are never removed. ${(rc.combined_sites || []).map(g => `<strong>${esc(g.name)}</strong> is evaluated as one location because units can be moved on site: removal candidates, capacity coverage, projected HPD and the repair average all span both. `).join('')}Percentages after removal compare against today's averages (distribution ${fNum(C.benchmark, 2)}${C.storeAvg != null ? `, store ${fNum(C.storeAvg, 3)}` : ''}). ` +
     `Workload is conserved: each DC's total hours are spread across the units that remain, which gives the projected HPD. ` +
     `<strong>Savings</strong> = PM invoices (${fDate(m.pm_window.start)}–${fDate(m.pm_window.end)}, annualized; PM is every 150 days, so it stops outright) + annual depreciation (owned, stops on disposal) or lease payments (leased, stops on return) + <strong>repair cost shift</strong>: repair spend follows hours, so the removed unit's annual hours are re-costed at the average repair cost per hour of the other units of its capacity class across the distribution fleet (6Ks against 6Ks, 8Ks against 8Ks)${rc.peer_min_months ? `, leaving out units under ${rc.peer_min_months} months old, which have little repair history yet` : ''}. Repair $/hr = lifetime spend minus PM, divided by lifetime hours. The shift is negative when the removed unit is cheaper to run than its class average.`;
   const k = [
@@ -905,7 +925,7 @@ function renderRecs() {
   const bp = rc.brand_preference;
   const protectedTag = u => bp && u.mfr === bp.keep && u.proj != null && u.proj < bp.max_hours ? ` <span class="badge badge-green">${esc(bp.keep)} under ${fNum(bp.max_hours, 0)} hrs</span>` : '';
   const vsLine = u => `${pctTxt(u.vsPct)} vs dist · ${pctTxt(u.vsStore)} vs store`;
-  const unitCell = u => `<div><div class="step-v">${esc(u.asset)} ${hpdPill(u)}${protectedTag(u)}</div><div class="muted">${esc(u.mfr)} ${esc(u.type)} · <strong>DC ${esc(u.loc)}</strong></div>
+  const unitCell = u => `<div><div class="step-v">${esc(u.asset)} ${hpdPill(u)}${protectedTag(u)}${specialTag(u)}</div><div class="muted">${esc(u.mfr)} ${esc(u.type)} · <strong>DC ${esc(u.loc)}</strong></div>
       <div class="muted">${vsLine(u)} · ${fNum(u.ageMonths / 12, 1)} yrs · ${esc(u.ownership)}</div></div>`;
   const stepCell = x => !x.swap ? `<div><div class="step-k">Remove (flagged unit)</div>${unitCell(x.u).replace(/^<div>|<\/div>$/g, '')}${x.override ? `<div class="swap-note">${esc(x.override)}</div>` : ''}</div>`
     : `<div><div class="step-k">Remove: ${x.basis === 'substitute' ? `oldest ${parseFloat(x.u.type)}K in place of a ${parseFloat(x.flagged.type)}K` : x.basis === 'brand' ? `${esc(bp.over)} ${parseFloat(x.u.type)}K (keeps a low-hour ${esc(bp.keep)})` : x.basis === 'same' ? `oldest ${parseFloat(x.u.type)}K` : `oldest ${parseFloat(x.u.type)}K (no other ${parseFloat(x.flagged.type)}K)`}</div>
@@ -923,7 +943,7 @@ function renderRecs() {
   const pctCell = p => p == null ? dash : `<span class="${p >= 0 ? 'pos' : 'neg'}">${fPct(p)}</span>`;
   simpleTable('recUnitTable', [
     { h: 'Location', f: x => esc(x.g.combined ? x.g.members.join(' + ') : x.g.id) }, { h: 'Step', f: x => x.n },
-    { h: 'Asset', f: x => `<strong>${esc(x.u.asset)}</strong>` }, { h: 'DC', f: x => esc(x.u.loc) }, { h: 'Type', left: 1, f: x => `${esc(x.u.mfr)} ${esc(x.u.type)}` },
+    { h: 'Asset', f: x => `<strong>${esc(x.u.asset)}</strong>` }, { h: 'DC', f: x => esc(x.u.loc) }, { h: 'Type', f: x => `${esc(x.u.mfr)} ${esc(shortType(x.u.type))}` },
     { h: 'HPD', f: x => `<span class="hpd-pill${x.u.flagged ? ' low' : ''}">${fNum(x.u.hpd, 2)}</span>` },
     { h: 'vs Dist Avg', f: x => pctCell(x.u.vsPct) }, { h: 'vs Store Avg', f: x => pctCell(x.u.vsStore) },
     { h: 'Total Hours', f: x => fNum(x.u.proj, 0) }, { h: 'Age (yrs)', f: x => fNum(x.u.ageMonths / 12, 1) },
@@ -967,12 +987,11 @@ function renderRecs() {
 
 /* Asset table (shared by DC Detail and Asset Detail) */
 const ASSET_COLS = [
-  { k: 'loc', h: 'DC' }, { k: 'asset', h: 'Asset', f: u => `<strong>${esc(u.asset)}</strong>` }, { k: 'type', h: 'Type', left: 1 },
-  { k: 'ownership', h: 'Own' }, { k: 'date_in', h: 'Date In', f: u => fShort(u.date_in) },
+  { k: 'loc', h: 'DC' }, { k: 'asset', h: 'Asset', f: u => `<strong>${esc(u.asset)}</strong>${specialTag(u)}` }, { k: 'type', h: 'Type', f: u => esc(shortType(u.type)) },
+  { k: 'ownership', h: 'Own', f: u => esc(shortOwn(u.ownership)) }, { k: 'date_in', h: 'Date In', f: u => fShort(u.date_in) },
   { k: 'ageMonths', h: 'Age (mo)', f: u => fNum(u.ageMonths, 1) },
-  { k: 'reading_hours', h: 'Accepted Reading', tip: 'Last DVIR reading that passed validation. Units with a replaced meter also show the old meter\'s hours, which are added for lifetime hours. Hover * for notes.', f: u => fNum(u.reading_hours, 1) + (u.prior_meter_hours ? `<div class="muted" style="font-size:10px">+ ${fNum(u.prior_meter_hours, 1)} old meter</div>` : '') + (u.baseline_meter_hours && u.reading_hours != null ? `<div class="muted" style="font-size:10px">− ${fNum(u.baseline_meter_hours, 1)} at delivery</div>` : '') + (u.reading_note ? `<span class="muted" title="${esc(u.reading_note)}">*</span>` : '') },
-  { k: 'reading_date', h: 'Read On', f: u => fShort(u.reading_date) },
-  { k: 'proj', h: 'Proj. Hours', tip: 'Last accepted reading carried forward to the hours as-of date at the unit\'s own lifetime rate.', f: u => fNum(u.proj, 1) + (u.derivedStatus === 'Stale' && u.proj != null ? `<div class="muted" style="font-size:10px">+${fNum(u.proj - u.reading_hours - (u.prior_meter_hours || 0) + (u.baseline_meter_hours || 0), 1)} carried forward</div>` : '') },
+  { k: 'reading_hours', h: 'Accepted Reading', tip: 'Last DVIR reading that passed validation. Units with a replaced meter also show the old meter\'s hours, which are added for lifetime hours. Hover * for notes.', f: u => fNum(u.reading_hours, 1) + (u.reading_date ? `<div class="muted" style="font-size:10px">${fShort(u.reading_date)}</div>` : '') + (u.prior_meter_hours ? `<div class="muted" style="font-size:10px">+ ${fNum(u.prior_meter_hours, 1)} old meter</div>` : '') + (u.baseline_meter_hours && u.reading_hours != null ? `<div class="muted" style="font-size:10px">− ${fNum(u.baseline_meter_hours, 1)} at delivery</div>` : '') + (u.reading_note ? `<span class="muted" title="${esc(u.reading_note)}">*</span>` : '') },
+  { k: 'proj', h: 'Proj. Hours', tip: 'Last accepted reading carried forward to the hours as-of date at the unit\'s own lifetime rate.', f: u => fNum(u.proj, 1) + (u.daysSince >= DIST_META.stale_after_days && u.proj != null ? `<div class="muted" style="font-size:10px">+${fNum(u.proj - u.reading_hours - (u.prior_meter_hours || 0) + (u.baseline_meter_hours || 0), 1)} carried forward</div>` : '') },
   { k: 'hpd', h: 'HPD', tip: 'Projected lifetime hours per operating day.', f: hpdBar },
   { k: 'vsPct', h: 'vs Avg', tip: 'Unit HPD vs the benchmark.', f: u => u.vsPct == null ? dash : `<span class="${u.vsPct >= 0 ? 'pos' : 'neg'}">${fPct(u.vsPct)}</span>` },
   { k: 'vsStore', h: 'vs Store', tip: 'Unit HPD vs the store fleet average. Reference only.', f: u => (p => p == null ? dash : `<span class="${p >= 0 ? 'pos' : 'neg'}">${fPct(p)}</span>`)(u.vsStore) },
@@ -1018,7 +1037,7 @@ function renderDCs() {
           ${cell('Avg CPH', fMoney(l.avgCph, 2))}
           ${cell('Annual P&L Cost', l.units && l.annual.missing < l.units ? fMoney(l.annual.value) : '—', l.annual.partial && l.annual.missing < l.units ? 'partial' : (l.leaseAnnual ? `incl. ${fMoney(l.leaseAnnual)} leases` : ''))}
           ${cell('Lifetime Maint.', l.units ? fMoney(l.spend.value) : '—', l.spend.partial ? 'partial' : '')}
-          ${cell('Stale / Held', `${l.stale} / ${l.held}`)}
+          ${cell('Held', `${l.held}`)}
           ${cell('No Readings', l.none)}
         </div>
       </div>
@@ -1076,11 +1095,11 @@ function renderQuality() {
   $('dqNote').innerHTML = m.hours_as_of
     ? `<strong>Last file processed:</strong> ${esc(m.last_file_processed || 'not recorded')}. ` + (m.dvir_days_in_history != null && m.first_dvir_date ? `${m.dvir_days_in_history} DVIR days validated, ${fDate(m.first_dvir_date)} through ${fDate(m.hours_as_of)}. ` : '') + `Spend through ${fDate(m.spend_as_of)}. Roster: ${esc(m.roster_file)}.`
     : `<strong>No DVIR files processed yet.</strong> Roster: ${esc(m.roster_file)}.`;
-  const tone = { 'Validated': '', 'Stale': 'yellow', 'Held for review': 'blue', 'No readings': 'gray' };
-  const sub = { 'Validated': `accepted reading within ${m.stale_after_days} days`, 'Stale': `no accepted reading in ${m.stale_after_days}+ days`, 'Held for review': 'meter or date in needs confirming', 'No readings': 'never inspected in the DVIR window' };
+  const tone = { 'Validated': '', 'Held for review': 'blue', 'No readings': 'gray' };
+  const sub = { 'Validated': 'has an accepted reading', 'Held for review': 'meter or date in needs confirming', 'No readings': 'never inspected in the DVIR window' };
   $('statusGrid').innerHTML = STATUSES.map(s => `<div class="kpi ${tone[s]}"><div class="kpi-label">${s}</div><div class="kpi-value">${t.byStatus[s]}</div><div class="kpi-sub">${sub[s]}</div></div>`).join('');
 
-  const attn = C.units.filter(u => u.derivedStatus !== 'Validated' || (u.shortHistory && u.hpd != null))
+  const attn = C.units.filter(u => u.derivedStatus !== 'Validated' || (u.shortHistory && u.hpd != null) || u.daysSince >= m.stale_after_days || u.status_note)
     .sort((a, b) => STATUSES.indexOf(b.derivedStatus) - STATUSES.indexOf(a.derivedStatus) || a.loc.localeCompare(b.loc));
   const why = u => {
     const shortNote = u.shortHistory && u.hpd != null ? ` Short history (${fNum(u.ageMonths, 1)} months, ${u.accepted_readings ?? 0} accepted readings), so left out of averages.` : '';
@@ -1088,11 +1107,11 @@ function renderQuality() {
     if (u.hold_note) return u.hold_note;
     if (u.derivedStatus === 'Held for review') return `First reading failed the age check${u.latest_reported_hours != null ? ` (reported ${fNum(u.latest_reported_hours, 1)} hrs)` : ''}. Confirm date in or meter.`;
     if (u.derivedStatus === 'No readings') return DIST_META.hours_as_of ? 'Never inspected in the DVIR window. Confirm it is in service.' : 'DVIR history not processed yet.';
-    if (u.derivedStatus === 'Stale') return `No accepted reading in ${fNum(u.daysSince)} days. Carried forward at its own pace (${fNum(u.hpd, 2)} HPD): ${fNum(u.reading_hours + (u.prior_meter_hours || 0), 1)} + ${fNum(u.proj - u.reading_hours - (u.prior_meter_hours || 0), 1)} hrs = ${fNum(u.proj, 1)}. Confirm it is still in service.` + shortNote;
+    if (u.derivedStatus === 'Validated' && u.daysSince >= m.stale_after_days) return `Last accepted reading ${fNum(u.daysSince)} days before the hours date. Carried forward at its own pace (${fNum(u.hpd, 2)} HPD): ${fNum(u.reading_hours + (u.prior_meter_hours || 0) - (u.baseline_meter_hours || 0), 1)} + ${fNum(u.proj - u.reading_hours - (u.prior_meter_hours || 0) + (u.baseline_meter_hours || 0), 1)} hrs = ${fNum(u.proj, 1)}${u.baseline_meter_hours ? ' hours since delivery' : ''}. Confirm it is still in service.` + shortNote;
     return shortNote.trim();
   };
   simpleTable('attnTable', [
-    { h: 'DC', k: 'loc' }, { h: 'Asset', f: u => `<strong>${esc(u.asset)}</strong>` }, { h: 'Type', k: 'type', left: 1 }, { h: 'Status', f: u => statusPill(u.derivedStatus) },
+    { h: 'DC', k: 'loc' }, { h: 'Asset', f: u => `<strong>${esc(u.asset)}</strong>${specialTag(u)}` }, { h: 'Type', k: 'type', left: 1 }, { h: 'Status', f: u => u.derivedStatus !== 'Validated' ? statusPill(u.derivedStatus) : u.daysSince >= DIST_META.stale_after_days ? `<span class="badge badge-yellow">Reading ${fNum(u.daysSince)} days old</span>` : statusPill(u.derivedStatus) },
     { h: 'Last Accepted', f: u => fNum(u.reading_hours, 1) }, { h: 'On', f: u => fShort(u.reading_date) },
     { h: 'Latest Reported', f: u => fNum(u.latest_reported_hours, 1) }, { h: 'On', f: u => fShort(u.latest_reported_date) },
     { h: 'What to Do', left: 1, f: u => `<div class="wrap">${esc(why(u))}</div>` }
